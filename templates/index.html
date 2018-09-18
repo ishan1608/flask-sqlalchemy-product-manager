@@ -8,7 +8,7 @@
 
 <h1>Books</h1>
 {% for book in books %}
-    <p>{{ book.title }}</p>
+    <p>{{ book.id }} : {{ book.title }}</p>
     <form method="post" action="/update">
         <input type="hidden" value="{{ book.title }}" name="oldtitle"/>
         <input type="text" value="{{ book.title }}" name="newtitle"/>
