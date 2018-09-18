@@ -8,14 +8,25 @@ database_file = 'sqlite:///{}'.format(os.path.join(project_dir, 'book_database.d
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = database_file
+# Disable soon to be deprecated signals
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
+
+
+class Book(db.Model):
+    title = db.Column(db.String(128), unique=True, nullable=False, primary_key=True)
+
+    def __repr__(self):
+        return '<Title: {}>'.format(self.title)
 
 
 @app.route('/', methods=['GET', 'POST', 'OPTIONS'])
 def home():
     if request.form:
-        print(request.form)
+        book = Book(title=request.form.get('title'))
+        db.session.add(book)
+        db.session.commit()
     return render_template('index.html')
 
 
