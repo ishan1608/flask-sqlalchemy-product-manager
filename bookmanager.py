@@ -4,10 +4,16 @@ from flask import Flask, render_template, request, redirect
 from flask_sqlalchemy import SQLAlchemy
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
-database_file = 'sqlite:///{}'.format(os.path.join(project_dir, 'book_database.db'))
+POSTGRES = {
+    'user': 'ishan',
+    'pw': '612189@p3',
+    'db': 'flask-crud',
+    'host': 'localhost',
+    'port': '5432'
+}
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = database_file
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 # Disable soon to be deprecated signals
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
