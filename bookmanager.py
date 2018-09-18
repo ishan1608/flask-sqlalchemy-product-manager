@@ -21,7 +21,7 @@ class Book(db.Model):
         return '<Title: {}>'.format(self.title)
 
 
-@app.route('/', methods=['GET', 'POST', 'OPTIONS'])
+@app.route('/', methods=['GET', 'POST'])
 def home():
     if request.form:
         book = Book(title=request.form.get('title'))
@@ -31,12 +31,21 @@ def home():
     return render_template('index.html', books=books)
 
 
-@app.route('/update', methods=['POST', 'OPTIONS'])
+@app.route('/update', methods=['POST'])
 def update():
     new_title = request.form.get('newtitle')
     old_title = request.form.get('oldtitle')
     book = Book.query.filter_by(title=old_title).first()
     book.title = new_title
+    db.session.commit()
+    return redirect('/')
+
+
+@app.route('/delete', methods=['POST'])
+def delete():
+    title = request.form.get('title')
+    book = Book.query.filter_by(title=title).first()
+    db.session.delete(book)
     db.session.commit()
     return redirect('/')
 
