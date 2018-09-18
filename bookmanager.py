@@ -27,18 +27,22 @@ class Book(db.Model):
         return '<Title: {}>'.format(self.title)
 
 
-@app.route('/', methods=['GET', 'POST'])
+@app.route('/', methods=['GET'])
 def home():
-    if request.form:
-        try:
-            book = Book(title=request.form.get('title'))
-            db.session.add(book)
-            db.session.commit()
-        except Exception as e:
-            print('Failed to add book')
-            print(e)
     books = Book.query.all()
     return render_template('index.html', books=books)
+
+
+@app.route('/create', methods=['POST'])
+def create():
+    try:
+        book = Book(title=request.form.get('title'))
+        db.session.add(book)
+        db.session.commit()
+    except Exception as e:
+        print('Failed to add book')
+        print(e)
+    return redirect('/')
 
 
 @app.route('/update', methods=['POST'])
