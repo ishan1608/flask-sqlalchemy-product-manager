@@ -110,5 +110,10 @@ def delete():
     return redirect('/')
 
 
+@app.route('/products/import/', methods=['GET'])
+def products_import():
+    return render_template('products_import.html')
+
+
 if __name__ == '__main__':
     app.run(debug=True)
