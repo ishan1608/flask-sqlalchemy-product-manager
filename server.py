@@ -2,8 +2,8 @@ import os
 
 from flask import Flask, render_template, request, redirect, abort
 from flask_restful import Resource, Api
-from flask_tus import tus_manager
 
+from flask_tus import tus_manager
 from models import db, Book
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
@@ -15,13 +15,22 @@ POSTGRES = {
     'port': '5432'
 }
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
-# Disable soon to be deprecated signals
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db.init_app(app)
+def create_app():
+    app = Flask(__name__)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
+    # Disable soon to be deprecated signals
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    db.init_app(app)
+    return app
+
+
+def get_db():
+    return db
+
+
+app = create_app()
 api = Api(app)
 
 tm = tus_manager(app, upload_url='/products-csv-upload', upload_folder='uploads/')
