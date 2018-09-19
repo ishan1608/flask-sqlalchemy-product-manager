@@ -1,7 +1,8 @@
 import os
 
 from flask import Flask, render_template, request, redirect
-from flask_sqlalchemy import SQLAlchemy
+
+from models import db, Book
 
 project_dir = os.path.dirname(os.path.abspath(__file__))
 POSTGRES = {
@@ -17,15 +18,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%
 # Disable soon to be deprecated signals
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
-db = SQLAlchemy(app)
-
-
-class Book(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(128), unique=True, nullable=False)
-
-    def __repr__(self):
-        return '<Title: {}>'.format(self.title)
+db.init_app(app)
 
 
 @app.route('/', methods=['GET'])
