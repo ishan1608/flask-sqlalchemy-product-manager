@@ -1,4 +1,4 @@
-from datetime import datetime
+import datetime
 
 from flask_sqlalchemy import SQLAlchemy
 
@@ -11,6 +11,11 @@ class BaseModel(db.Model):
 
     __abstract__ = True
 
+    def _to_dict(self):
+        return {
+            'id': self.id
+        }
+
     def json(self):
         """Base way to jsonify models, dealing with datetime objects"""
         return {
@@ -21,6 +26,13 @@ class BaseModel(db.Model):
 
 class Book(BaseModel):
     title = db.Column(db.String(128), unique=True, nullable=False)
+
+    def _to_dict(self):
+        dictionary = super()._to_dict()
+        dictionary.update({
+            'title': self.title
+        })
+        return dictionary
 
     def __repr__(self):
         return '<Title: {}>'.format(self.title)
