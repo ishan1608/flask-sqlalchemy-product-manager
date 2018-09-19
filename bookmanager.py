@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, render_template, request, redirect, abort
 from flask_restful import Resource, Api
+from flask_tus import tus_manager
 
 from models import db, Book
 
@@ -22,6 +23,14 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 
 api = Api(app)
+
+tm = tus_manager(app, upload_url='/products-csv-upload', upload_folder='uploads/')
+
+
+@tm.upload_file_handler
+def upload_file_hander(upload_file_path, filename):
+    print("doing something cool with {}, {}".format(upload_file_path, filename))
+    return filename
 
 
 class BookResource(Resource):
@@ -112,7 +121,7 @@ def delete():
 
 @app.route('/products/import/', methods=['GET'])
 def products_import():
-    return render_template('products_import.html')
+    return render_template('products_import.html', tm=tm)
 
 
 if __name__ == '__main__':

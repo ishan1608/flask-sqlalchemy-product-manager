@@ -1,7 +1,6 @@
 flask
 flask-restful
 flask-sqlalchemy
-Flask-Tus
 psycopg2-binary
 redis
 sqlalchemy
