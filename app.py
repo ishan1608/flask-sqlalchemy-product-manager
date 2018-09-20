@@ -1,7 +1,8 @@
 import os
 
-from flask import Flask, render_template, request, redirect
+from flask import Flask, render_template, request, redirect, abort, jsonify
 from flask_restful import Api
+from sqlalchemy import inspect, or_
 
 from api import BookResource, BookResourceList, ProductResource, ProductResourceList
 from flask_tus import tus_manager
@@ -100,9 +101,43 @@ def delete():
     return redirect('/')
 
 
-@app.route('/products/import/', methods=['GET'])
+@app.route('/product/import/', methods=['GET'])
 def products_import():
     return render_template('products_import.html', tm=tm)
+
+
+@app.route('/product/search/', methods=['GET'])
+def products_search():
+    from models import Product
+
+    query = request.args.get('query', '')
+    field = request.args.get('field')
+
+    searchable_fields = [field.key for field in inspect(Product).attrs if field.key not in ['id', 'is_active']]
+    if field and field not in searchable_fields:
+        abort(400, {
+            'message': 'Field: {} is not valid'.format(field)
+        })
+    if not field:
+        products = Product.query.filter(or_(
+            Product.name.contains(query),
+            Product.sku.contains(query),
+            Product.description.contains(query)
+        ))
+    else:
+        products = Product.query.filter(getattr(Product, field).contains(query))
+
+    total_products_count = products.count()
+    products = [product.json() for product in products.slice(0, 10)]
+    return jsonify({
+        'meta': {
+            'count': len(products),
+            'total_count': total_products_count,
+            # 'previous': '/product/?offset={}&limit={}'.format(offset - limit, limit) if (offset - limit) >= 0 else None,
+            # 'next': '/product/?offset={}&limit={}'.format(offset + limit, limit) if (offset + limit) < total_products_count else None
+        },
+        'objects': products
+    })
 
 
 if __name__ == '__main__':
