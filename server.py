@@ -40,10 +40,7 @@ tm = tus_manager(app, upload_url='/products-csv-upload', upload_folder='uploads/
 def upload_file_hander(upload_file_path, filename):
     from celery_tasks import process_csv
 
-    print("doing something cool with {}, {}".format(upload_file_path, filename))
-    output_file = '{}_{}'.format(upload_file_path, filename)
-    os.rename(upload_file_path, output_file)
-    process_csv(output_file)
+    process_csv(upload_file_path)
     return filename
 
 
