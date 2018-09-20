@@ -3,7 +3,7 @@ import csv
 from celery import Celery
 from sqlalchemy.exc import IntegrityError
 
-from server import create_app
+from app import create_app
 
 
 def make_celery(app):
@@ -33,7 +33,7 @@ celery = make_celery(app)
 @celery.task()
 def process_csv(file_path):
     from models import Product
-    from server import get_db
+    from app import get_db
 
     db = get_db()
 
