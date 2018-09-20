@@ -81,11 +81,18 @@ class ProductResourceList(Resource):
                 'message': 'No more products found'
             })
 
+        if offset < 0 or limit <= 0:
+            abort(400, {
+                'message': 'Invalid offset or limit'
+            })
+
         products = [product.json() for product in Product.query.order_by(desc(Product.id)).slice(offset, offset + limit)]
         return {
             'meta': {
                 'count': len(products),
-                'total_count': total_products_count
+                'total_count': total_products_count,
+                'previous': '/product/?offset={}&limit={}'.format(offset - limit, limit) if (offset - limit) >= 0 else None,
+                'next': '/product/?offset={}&limit={}'.format(offset + limit, limit) if (offset + limit) < total_products_count else None
             },
             'objects': products
         }
