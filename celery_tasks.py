@@ -1,6 +1,8 @@
 import csv
 
 from celery import Celery
+from sqlalchemy.exc import IntegrityError
+
 from server import create_app
 
 
@@ -48,5 +50,10 @@ def process_csv(file_path):
                 )
                 db.session.add(product)
                 db.session.commit()
+            except IntegrityError as error:
+                print('==========================================================================================================')
+                print(error)
+                print('==========================================================================================================')
+                db.session.rollback()
             except Exception as exception:
                 print(exception)

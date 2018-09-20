@@ -7,6 +7,8 @@ from api import BookResource, BookResourceList, ProductResource, ProductResource
 from flask_tus import tus_manager
 from models import db, Book
 
+CELERY_ENABLED = True
+
 project_dir = os.path.dirname(os.path.abspath(__file__))
 POSTGRES = {
     'user': 'ishan',
@@ -44,7 +46,10 @@ tm = tus_manager(app, upload_url='/products-csv-upload', upload_folder='uploads/
 def upload_file_hander(upload_file_path, filename):
     from celery_tasks import process_csv
 
-    process_csv.apply_async(args=[upload_file_path], queue='flask-crud-celery')
+    if CELERY_ENABLED:
+        process_csv.apply_async(args=[upload_file_path], queue='flask-crud-celery')
+    else:
+        process_csv(upload_file_path)
     return filename
 
 
