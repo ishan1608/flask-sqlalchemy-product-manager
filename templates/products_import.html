@@ -3,86 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <title>Products Import</title>
-    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet" />
-    <link href="{{ url_for('static', filename='css/demo.css') }}" rel="stylesheet" media="screen" />
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"/>
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
 </head>
 <body>
-    <div class="container">
-      <h1>tus-js-client demo</h1>
+<div class="container">
+    <h1>Products Import (CSV)</h1>
 
-      <p>
-        For a prettier demo please go to the
-        <a href="http://tus.io/demo.html">tus.io</a> website.
-        This demo is just here to aid developers.
-      </p>
+    <p>
+    <h3>Upload products in bulk through a CSV file.</h3>
+    <br/>
+    NOTE: SKU should be unique. If duplicate, then the older entry will be kept while discarding the newer entry.
+    </p>
 
-      <div class="alert alert-warining hidden" id="support-alert">
-        <b>Warning!</b> Your browser does not seem to support the features necessary to run tus-js-client. The buttons below may work but probably will fail silently.
-      </div>
+    <div class="alert alert-warining hidden" id="support-alert">
+        <b>Warning!</b> Your browser does not seem to support the features necessary to run tus-js-client. The buttons below may work but probably
+        will fail silently.
+    </div>
 
-      <br />
+    <br/>
 
-      <table>
-        <tr>
-          <td>
-            <label for="endpoint">
-              Upload endpoint:
-            </label>
-          </td>
-          <td>
-            <input type="text" id="endpoint" name="endpoint" value="{{ tm.upload_url }}">
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <label for="chunksize">
-              Chunk size (bytes):
-            </label>
-          </td>
-          <td>
-            <input type="number" id="chunksize" name="chunksize">
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <label for="resume">
-              Perform full upload:
-              <br />
-              <small>(even if we could resume)</small>
-            </label>
-          </td>
-          <td>
-            <input type="checkbox" id="resume">
-          </td>
-        </tr>
-      </table>
+    <input type="file">
 
-      <br />
+    <br/>
+    <br/>
 
-      <input type="file">
-
-      <br />
-      <br />
-
-      <div class="row">
+    <div class="row">
         <div class="span8">
-          <div class="progress progress-striped progress-success">
-            <div class="bar" style="width: 0%;"></div>
-          </div>
+            <div class="progress progress-striped progress-success">
+                <div class="bar" style="width: 0%;"></div>
+            </div>
         </div>
         <div class="span4">
-          <button class="btn stop" id="toggle-btn">start upload</button>
+            <button class="btn stop" id="toggle-btn">start upload</button>
         </div>
-      </div>
-
-      <hr />
-      <h3>Uploads</h3>
-      <p id="upload-list">
-        Succesful uploads will be listed here. Try one!
-      </p>
-
     </div>
+
+    <hr/>
+    <p id="upload-result">
+    </p>
+
+</div>
 </body>
 <script src="{{ url_for('static', filename='js/tus.js') }}"></script>
-<script src="{{ url_for('static', filename='js/demo.js') }}"></script>
+<script src="{{ url_for('static', filename='js/products_import_main.js') }}"></script>
 </html>
