@@ -2,7 +2,7 @@ import os
 
 from flask import Flask, render_template, request, redirect, abort, jsonify
 from flask_restful import Api
-from sqlalchemy import inspect, or_
+from sqlalchemy import inspect, or_, desc
 
 from api import BookResource, BookResourceList, ProductResource, ProductResourceList
 from flask_tus import tus_manager
@@ -112,6 +112,13 @@ def products_search():
 
     query = request.args.get('query', '')
     field = request.args.get('field')
+    offset = int(request.args.get('offset', 0))
+    limit = int(request.args.get('limit', 10))
+
+    if offset < 0 or limit <= 0:
+        abort(400, {
+            'message': 'Invalid offset or limit'
+        })
 
     searchable_fields = [field.key for field in inspect(Product).attrs if field.key not in ['id', 'is_active']]
     if field and field not in searchable_fields:
@@ -119,22 +126,22 @@ def products_search():
             'message': 'Field: {} is not valid'.format(field)
         })
     if not field:
-        products = Product.query.filter(or_(
+        products = Product.query.order_by(Product.id).filter(or_(
             Product.name.contains(query),
             Product.sku.contains(query),
             Product.description.contains(query)
         ))
     else:
-        products = Product.query.filter(getattr(Product, field).contains(query))
+        products = Product.query.order_by(desc(Product.id)).filter(getattr(Product, field).contains(query))
 
     total_products_count = products.count()
-    products = [product.json() for product in products.slice(0, 10)]
+    products = [product.json() for product in products.slice(offset, offset + limit)]
     return jsonify({
         'meta': {
             'count': len(products),
             'total_count': total_products_count,
-            # 'previous': '/product/?offset={}&limit={}'.format(offset - limit, limit) if (offset - limit) >= 0 else None,
-            # 'next': '/product/?offset={}&limit={}'.format(offset + limit, limit) if (offset + limit) < total_products_count else None
+            'previous': '/product/?offset={}&limit={}'.format(offset - limit, limit) if (offset - limit) >= 0 else None,
+            'next': '/product/?offset={}&limit={}'.format(offset + limit, limit) if (offset + limit) < total_products_count else None
         },
         'objects': products
     })
