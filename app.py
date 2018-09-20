@@ -4,7 +4,7 @@ from flask import Flask, render_template, request, redirect, abort, jsonify
 from flask_restful import Api
 from sqlalchemy import inspect, or_, desc
 
-from api import BookResource, BookResourceList, ProductResource, ProductResourceList
+from api import BookResource, BookResourceList, ProductResource, ProductResourceList, WebhookConfigResource
 from flask_tus import tus_manager
 from models import db, Book
 
@@ -58,6 +58,7 @@ api.add_resource(BookResource, '/book/<int:book_id>/')
 api.add_resource(BookResourceList, '/book/')
 api.add_resource(ProductResource, '/product/<int:product_id>/')
 api.add_resource(ProductResourceList, '/product/')
+api.add_resource(WebhookConfigResource, '/webhook-config/')
 
 
 @app.route('/', methods=['GET'])

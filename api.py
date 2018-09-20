@@ -1,8 +1,13 @@
+import pickledb
+
 from flask import request, abort
 from flask_restful import Resource
 from sqlalchemy import desc
 
 from models import db, Book, Product
+from util import url_validator
+
+config_db = pickledb.load('config.db', False)
 
 
 class BookResource(Resource):
@@ -143,3 +148,24 @@ class ProductResourceList(Resource):
             post_product_webhook(product, action)
 
         return product.json()
+
+
+class WebhookConfigResource(Resource):
+    def get(self):
+        url = config_db.get('webhook_config')
+        return {
+            'object': url
+        }
+
+    def post(self):
+        url = request.form.get('url')
+        if not url_validator(url):
+            abort(400, {
+                'message': 'Invalid URL'
+            })
+
+        config_db.set('webhook_config', url)
+        config_db.dump()
+        return {
+            'object': url
+        }
