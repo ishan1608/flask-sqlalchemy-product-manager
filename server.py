@@ -3,7 +3,7 @@ import os
 from flask import Flask, render_template, request, redirect
 from flask_restful import Api
 
-from api import BookResource, BookResourceList
+from api import BookResource, BookResourceList, ProductResource, ProductResourceList
 from flask_tus import tus_manager
 from models import db, Book
 
@@ -50,6 +50,8 @@ def upload_file_hander(upload_file_path, filename):
 
 api.add_resource(BookResource, '/book/<int:book_id>/')
 api.add_resource(BookResourceList, '/book/')
+api.add_resource(ProductResource, '/product/<int:product_id>/')
+api.add_resource(ProductResourceList, '/product/')
 
 
 @app.route('/', methods=['GET'])
