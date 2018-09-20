@@ -1,9 +1,11 @@
 import csv
+import requests
 
 from celery import Celery
 from sqlalchemy.exc import IntegrityError
 
 from app import create_app
+from models import Product
 
 
 def make_celery(app):
@@ -57,3 +59,16 @@ def process_csv(file_path):
                 db.session.rollback()
             except Exception as exception:
                 print(exception)
+
+
+@celery.task()
+def post_product_webhook(product_id, action):
+    product = Product.query.get(product_id)
+    payload = {
+        'action': action,
+        'object': product.json()
+    }
+    if action == 'update':
+        requests.put('http://ishan-request-bin.herokuapp.com/10wccz51', json=payload)
+    else:
+        requests.post('http://ishan-request-bin.herokuapp.com/10wccz51', json=payload)

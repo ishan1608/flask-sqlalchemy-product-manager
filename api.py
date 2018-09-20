@@ -56,6 +56,10 @@ class ProductResource(Resource):
         return product.json()
 
     def put(self, product_id):
+        from app import CELERY_ENABLED
+
+        from celery_tasks import post_product_webhook
+
         product = Product.query.filter_by(id=product_id).first()
         if not product:
             abort(404, {
@@ -66,6 +70,14 @@ class ProductResource(Resource):
         product.description = request.form.get('description', product.description)
         product.is_active = request.form.get('is_active', product.is_active)
         db.session.commit()
+
+        # Trigger Webhook
+        action = 'update'
+        if CELERY_ENABLED:
+            post_product_webhook.apply_async(args=[product.id, action], queue='flask-crud-celery')
+        else:
+            post_product_webhook(product, action)
+
         return product.json()
 
 
@@ -98,6 +110,10 @@ class ProductResourceList(Resource):
         }
 
     def post(self):
+        from app import CELERY_ENABLED
+
+        from celery_tasks import post_product_webhook
+
         sku = request.form.get('sku')
         name = request.form.get('name')
         description = request.form.get('description', '')
@@ -118,4 +134,12 @@ class ProductResourceList(Resource):
         )
         db.session.add(product)
         db.session.commit()
+
+        # Trigger Webhook
+        action = 'create'
+        if CELERY_ENABLED:
+            post_product_webhook.apply_async(args=[product.id, action], queue='flask-crud-celery')
+        else:
+            post_product_webhook(product, action)
+
         return product.json()
