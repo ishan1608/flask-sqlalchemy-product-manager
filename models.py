@@ -36,3 +36,23 @@ class Book(BaseModel):
 
     def __repr__(self):
         return '<Title: {}>'.format(self.title)
+
+
+class Product(BaseModel):
+    sku = db.Column(db.String(64), unique=True, nullable=False)
+    name = db.Column(db.String(256), unique=False, nullable=False)
+    description = db.Column(db.Text())
+    is_active = db.Column(db.Boolean())
+
+    def _to_dict(self):
+        dictionary = super()._to_dict()
+        dictionary.update({
+            'sku': self.sku,
+            'name': self.name,
+            'description': self.description,
+            'is_active': self.is_active,
+        })
+        return dictionary
+
+    def __repr__(self):
+        return '<sku: {}>'.format(self.sku)
