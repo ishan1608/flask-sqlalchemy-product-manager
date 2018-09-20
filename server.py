@@ -22,6 +22,9 @@ def create_app():
     # Disable soon to be deprecated signals
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+    app.config['CELERY_BROKER_URL'] = 'redis://localhost:6379'
+    app.config['CELERY_RESULT_BACKEND'] = 'redis://localhost:6379'
+
     db.init_app(app)
     return app
 
@@ -40,7 +43,7 @@ tm = tus_manager(app, upload_url='/products-csv-upload', upload_folder='uploads/
 def upload_file_hander(upload_file_path, filename):
     from celery_tasks import process_csv
 
-    process_csv(upload_file_path)
+    process_csv.apply_async(args=[upload_file_path], queue='flask-crud-celery')
     return filename
 
 

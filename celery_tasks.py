@@ -1,6 +1,34 @@
 import csv
 
+from celery import Celery
+from server import create_app
 
+
+def make_celery(app):
+    celery = Celery(app.import_name, backend=app.config['CELERY_RESULT_BACKEND'], broker=app.config['CELERY_BROKER_URL'])
+    celery.conf.update(app.config)
+
+    TaskBase = celery.Task
+
+    class ContextTask(TaskBase):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            with app.app_context():
+                return TaskBase.__call__(self, *args, **kwargs)
+    celery.Task = ContextTask
+
+    celery.conf.update({
+        'CELERY_DEFAULT_QUEUE': 'flask-crud-celery',
+    })
+    return celery
+
+
+app = create_app()
+celery = make_celery(app)
+
+
+@celery.task()
 def process_csv(file_path):
     from models import Product
     from server import get_db
