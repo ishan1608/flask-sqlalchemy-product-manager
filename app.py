@@ -1,7 +1,8 @@
+import json
 import logging
 import os
 
-from flask import Flask, render_template, request, redirect, abort, jsonify
+from flask import Flask, render_template, request, redirect, jsonify, Response
 from flask_restful import Api
 from sqlalchemy import inspect, or_, desc
 
@@ -69,15 +70,20 @@ def products_search():
     limit = int(request.args.get('limit', 10))
 
     if offset < 0 or limit <= 0:
-        abort(400, {
-            'message': 'Invalid offset or limit'
-        })
+        return Response(
+            response=json.dumps(dict(description='Invalid offset or limit')),
+            status=400,
+            mimetype='application/json'
+        )
 
     searchable_fields = [field.key for field in inspect(Product).attrs if field.key not in ['id', 'is_active']]
     if field and field not in searchable_fields:
-        abort(400, {
-            'message': 'Field: {} is not valid'.format(field)
-        })
+        return Response(
+            response=json.dumps(dict(description='Field: "{}" is not valid'.format(field))),
+            status=400,
+            mimetype='application/json'
+        )
+
     if not field:
         products = Product.query.order_by(Product.id).filter(or_(
             Product.name.contains(query),

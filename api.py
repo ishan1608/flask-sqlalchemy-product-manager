@@ -14,9 +14,7 @@ class ProductResource(Resource):
     def get(self, product_id):
         product = Product.query.filter_by(id=product_id).first()
         if not product:
-            abort(404, {
-                'message': 'Product: {} Not Found'.format(product_id)
-            })
+            abort(404, description='Product: {} Not Found'.format(product_id))
         return product.json()
 
     def put(self, product_id):
@@ -24,9 +22,7 @@ class ProductResource(Resource):
 
         product = Product.query.filter_by(id=product_id).first()
         if not product:
-            abort(404, {
-                'message': 'Product: {} Not Found'.format(product_id)
-            })
+            abort(404, description='Product: {} Not Found'.format(product_id))
         product.sku = request.form.get('sku', product.sku)
         product.name = request.form.get('name', product.name)
         product.description = request.form.get('description', product.description)
@@ -50,9 +46,7 @@ class ProductResourceList(Resource):
         is_active = request.args.get('is_active')
 
         if offset < 0 or limit <= 0:
-            abort(400, {
-                'message': 'Invalid offset or limit'
-            })
+            abort(400, description='Invalid offset or limit')
 
         products = Product.query.order_by(desc(Product.id))
         if is_active is not None:
@@ -80,13 +74,9 @@ class ProductResourceList(Resource):
         description = request.form.get('description', '')
         is_active = request.form.get('is_active', True)
         if not sku:
-            abort(400, {
-                'message': 'SKU cannot be blank'
-            })
+            abort(400, description='SKU cannot be blank')
         if not name:
-            abort(400, {
-                'message': 'Name cannot be blank'
-            })
+            abort(400, description='Name cannot be blank')
         product = Product(
             sku=sku,
             name=name,
@@ -116,9 +106,7 @@ class WebhookConfigResource(Resource):
     def post(self):
         url = request.form.get('url')
         if not url_validator(url):
-            abort(400, {
-                'message': 'Invalid URL'
-            })
+            abort(400, description='Invalid URL')
 
         config_db.set('webhook_config', url)
         config_db.dump()
@@ -135,17 +123,13 @@ class BookResource(Resource):
     def get(self, book_id):
         book = Book.query.filter_by(id=book_id).first()
         if not book:
-            abort(404, {
-                'message': 'Book: {} Not Found'.format(book_id)
-            })
+            abort(404, description='Book: {} Not Found'.format(book_id))
         return book.json()
 
     def put(self, book_id):
         book = Book.query.filter_by(id=book_id).first()
         if not book:
-            abort(404, {
-                'message': 'Book: {} Not Found'.format(book_id)
-            })
+            abort(404, description='Book: {} Not Found'.format(book_id))
         title = request.form.get('title')
         book.title = title
         db.session.commit()
@@ -163,9 +147,7 @@ class BookResourceList(Resource):
     def post(self):
         title = request.form.get('title')
         if not title:
-            abort(400, {
-                'message': 'Title cannot be blank'
-            })
+            abort(400, description= 'Title cannot be blank')
         book = Book(title=title)
         db.session.add(book)
         db.session.commit()
