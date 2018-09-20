@@ -1,5 +1,6 @@
 from flask import request, abort
 from flask_restful import Resource
+from sqlalchemy import desc
 
 from models import db, Book, Product
 
@@ -70,10 +71,22 @@ class ProductResource(Resource):
 
 class ProductResourceList(Resource):
     def get(self):
-        # TODO Add pagination, use query for count, ordering and slicing
-        products = [product.json() for product in Product.query.all()]
+        offset = int(request.args.get('offset', 0))
+        limit = int(request.args.get('limit', 10))
+
+        total_products_count = Product.query.count()
+
+        if total_products_count <= offset:
+            abort(404, {
+                'message': 'No more products found'
+            })
+
+        products = [product.json() for product in Product.query.order_by(desc(Product.id)).slice(offset, offset + limit)]
         return {
-            'count': len(products),
+            'meta': {
+                'count': len(products),
+                'total_count': total_products_count
+            },
             'objects': products
         }
 
