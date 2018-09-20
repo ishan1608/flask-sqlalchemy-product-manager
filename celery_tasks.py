@@ -1,11 +1,15 @@
 import csv
-import requests
 
+import pickledb
+import requests
 from celery import Celery
 from sqlalchemy.exc import IntegrityError
 
+import settings
 from app import create_app
 from models import Product
+
+config_db = pickledb.load(settings.CONFIG_DB, False)
 
 
 def make_celery(app):
@@ -68,7 +72,11 @@ def post_product_webhook(product_id, action):
         'action': action,
         'object': product.json()
     }
+    webhook_config_url = config_db.get('webhook_config')
+    if not webhook_config_url:
+        return
+
     if action == 'update':
-        requests.put('http://ishan-request-bin.herokuapp.com/10wccz51', json=payload)
+        requests.put(webhook_config_url, json=payload)
     else:
-        requests.post('http://ishan-request-bin.herokuapp.com/10wccz51', json=payload)
+        requests.post(webhook_config_url, json=payload)
