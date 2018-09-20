@@ -47,20 +47,21 @@ class ProductResourceList(Resource):
     def get(self):
         offset = int(request.args.get('offset', 0))
         limit = int(request.args.get('limit', 10))
-
-        total_products_count = Product.query.count()
-
-        if total_products_count <= offset:
-            abort(404, {
-                'message': 'No more products found'
-            })
+        is_active = request.args.get('is_active')
 
         if offset < 0 or limit <= 0:
             abort(400, {
                 'message': 'Invalid offset or limit'
             })
 
-        products = [product.json() for product in Product.query.order_by(desc(Product.id)).slice(offset, offset + limit)]
+        products = Product.query.order_by(desc(Product.id))
+        if is_active is not None:
+            is_active = False if is_active.lower() == 'false' else True
+            products = products.filter_by(is_active=is_active)
+
+        total_products_count = products.count()
+
+        products = [product.json() for product in products.slice(offset, offset + limit)]
         return {
             'meta': {
                 'count': len(products),
