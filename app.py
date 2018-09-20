@@ -1,3 +1,4 @@
+import logging
 import os
 
 from flask import Flask, render_template, request, redirect, abort, jsonify
@@ -7,6 +8,8 @@ from sqlalchemy import inspect, or_, desc
 from api import BookResource, BookResourceList, ProductResource, ProductResourceList, WebhookConfigResource
 from flask_tus import tus_manager
 from models import db, Book
+
+logging.basicConfig(filename='default.log', level=logging.DEBUG)
 
 CELERY_ENABLED = True
 
@@ -74,8 +77,8 @@ def create():
         db.session.add(book)
         db.session.commit()
     except Exception as e:
-        print('Failed to add book')
-        print(e)
+        app.logger.error('Failed to add book')
+        app.logger.error(e)
     return redirect('/')
 
 
@@ -88,8 +91,8 @@ def update():
         book.title = new_title
         db.session.commit()
     except Exception as e:
-        print("Couldn't update book title")
-        print(e)
+        app.logger.error("Couldn't update book title")
+        app.logger.error(e)
     return redirect('/')
 
 

@@ -58,7 +58,7 @@ def process_csv(file_path):
                 print('==========================================================================================================')
                 db.session.rollback()
             except Exception as exception:
-                print(exception)
+                app.logger.error(exception)
 
 
 @celery.task()
