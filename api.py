@@ -1,5 +1,5 @@
 import pickledb
-from flask import request, abort
+from flask import request, abort, make_response
 from flask_restful import Resource
 from sqlalchemy import desc
 
@@ -40,6 +40,15 @@ class ProductResource(Resource):
 
 
 class ProductResourceList(Resource):
+    def head(self):
+        active_products_count = Product.query.filter_by(is_active=True).count()
+        inactive_products_count = Product.query.filter_by(is_active=False).count()
+        resp = make_response()
+        resp.headers['TOTAL_COUNT'] = active_products_count + inactive_products_count
+        resp.headers['ACTIVE_COUNT'] = active_products_count
+        resp.headers['INACTIVE_COUNT'] = inactive_products_count
+        return resp
+
     def get(self):
         offset = int(request.args.get('offset', 0))
         limit = int(request.args.get('limit', 10))
