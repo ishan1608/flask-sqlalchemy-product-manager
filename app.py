@@ -105,6 +105,13 @@ def products_search():
         'objects': products
     })
 
+
+# React.js based Frontend Application
+@app.route('/', methods=['GET'])
+def home():
+    return render_template('index.html')
+
+
 ##################################
 # BOOKS
 ##################################
