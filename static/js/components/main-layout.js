@@ -5,7 +5,7 @@ const MainLayout = React.createClass({
   render: function() {
     return (
       <div className="app">
-        <header className="primary-header"></header>
+        <header className="primary-header"/>
         <aside className="primary-aside">
           <ul>
             <li><Link to="/" activeClassName="active">Home</Link></li>

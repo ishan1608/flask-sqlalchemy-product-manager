@@ -5,7 +5,9 @@ module.exports = {
     output: {
         path: path.resolve(__dirname, 'static/js'),
         filename: "bundle.js",
+        sourceMapFilename: "static/js/bundle.map"
     },
+    devtool: '#source-map',
     module: {
         loaders: [
             {
