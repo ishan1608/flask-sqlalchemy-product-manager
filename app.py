@@ -105,10 +105,19 @@ def products_search():
         'objects': products
     })
 
+##################################
+# BOOKS
+##################################
+
 
 @app.route('/', methods=['GET'])
 def index():
-    return render_template('index.html', )
+    return render_template('index.html')
+
+
+@app.route('/products/active', methods=['GET'])
+def products_active():
+    return render_template('products_active.html')
 
 ##################################
 # BOOKS

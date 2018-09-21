@@ -68,6 +68,7 @@ class ProductResourceList(Resource):
         return {
             'meta': {
                 'count': len(products),
+                'offset': offset,
                 'total_count': total_products_count,
                 'previous': '/product/?offset={}&limit={}'.format(offset - limit, limit) if (offset - limit) >= 0 else None,
                 'next': '/product/?offset={}&limit={}'.format(offset + limit, limit) if (offset + limit) < total_products_count else None

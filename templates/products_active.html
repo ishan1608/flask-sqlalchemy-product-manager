@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products Import</title>
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"/>
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/underscore.js') }}"></script>
+</head>
+<body>
+<div class="container">
+    <h1>Active Products (<span id="start-position"></span> -- <span id="end-position"></span>)</h1>
+    <ul id="products-list"></ul>
+</div>
+<script type="text/html" id="ProductTmpl">
+<li>
+    <p>Name: <input type="text" id="name" value="<%= name %>"/></p>
+    <p>SKU: <input type="text" id="sku" value="<%= sku %>"/></p>
+    <p>Description: <input type="text" id="description" value="<%= description %>"/></p>
+    <p>Is Active: <input type="checkbox" id="is_active" checked="<%= is_active %>"/></p>
+    <input id="submit" type="submit" value="Update" data-id="<%= id %>"/>
+</li>
+</script>
+<script type="text/javascript">
+    $(function() {
+        $.ajax({
+            method: 'GET',
+            url: {{ url_for('productresourcelist') }} + '?is_active=true',
+        }).done(function (data) {
+            $('#start-position').text(data.meta.offset);
+            $('#end-position').text(data.meta.offset + data.meta.count);
+
+            let productsList = $('#products-list');
+            _.each(data.objects, function(object) {
+                productsList.append(_.template($('#ProductTmpl').html())(object));
+            });
+        });
+    });
+</script>
+</body>
+</html>
