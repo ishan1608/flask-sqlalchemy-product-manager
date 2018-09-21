@@ -114,13 +114,13 @@ api.add_resource(BookResource, '/book/<int:book_id>/')
 api.add_resource(BookResourceList, '/book/')
 
 
-@app.route('/', methods=['GET'])
+@app.route('/books', methods=['GET'])
 def home():
     books = Book.query.all()
-    return render_template('index.html', books=books)
+    return render_template('books-index.html', books=books)
 
 
-@app.route('/create', methods=['POST'])
+@app.route('/books/create', methods=['POST'])
 def create():
     try:
         book = Book(title=request.form.get('title'))
@@ -129,10 +129,10 @@ def create():
     except Exception as e:
         app.logger.error('Failed to add book')
         app.logger.error(e)
-    return redirect('/')
+    return redirect('/books')
 
 
-@app.route('/update', methods=['POST'])
+@app.route('/books/update', methods=['POST'])
 def update():
     try:
         new_title = request.form.get('newtitle')
@@ -143,16 +143,16 @@ def update():
     except Exception as e:
         app.logger.error("Couldn't update book title")
         app.logger.error(e)
-    return redirect('/')
+    return redirect('/books')
 
 
-@app.route('/delete', methods=['POST'])
+@app.route('/books/delete', methods=['POST'])
 def delete():
     title = request.form.get('title')
     book = Book.query.filter_by(title=title).first()
     db.session.delete(book)
     db.session.commit()
-    return redirect('/')
+    return redirect('/books')
 
 
 if __name__ == '__main__':

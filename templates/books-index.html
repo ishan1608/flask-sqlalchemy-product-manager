@@ -1,7 +1,7 @@
 <html>
 <body>
 <h1>Add Book</h1>
-<form method="POST" action="/create">
+<form method="POST" action="/books/create">
     <input type="text" name="title">
     <input type="submit" value="Add">
 </form>
@@ -9,12 +9,12 @@
 <h1>Books</h1>
 {% for book in books %}
     <p>{{ book.id }} : {{ book.title }}</p>
-    <form method="post" action="/update">
+    <form method="post" action="/books/update">
         <input type="hidden" value="{{ book.title }}" name="oldtitle"/>
         <input type="text" value="{{ book.title }}" name="newtitle"/>
         <input type="submit" value="Update"/>
     </form>
-    <form method="post" action="/delete">
+    <form method="post" action="/books/delete">
         <input type="hidden" value="{{ book.title }}" name="title">
         <input type="submit" value="Delete">
     </form>
