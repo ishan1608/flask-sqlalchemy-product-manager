@@ -115,13 +115,13 @@ api.add_resource(BookResourceList, '/book/')
 
 
 @app.route('/books', methods=['GET'])
-def home():
+def books_index():
     books = Book.query.all()
     return render_template('books-index.html', books=books)
 
 
 @app.route('/books/create', methods=['POST'])
-def create():
+def books_create():
     try:
         book = Book(title=request.form.get('title'))
         db.session.add(book)
@@ -133,7 +133,7 @@ def create():
 
 
 @app.route('/books/update', methods=['POST'])
-def update():
+def books_update():
     try:
         new_title = request.form.get('newtitle')
         old_title = request.form.get('oldtitle')
@@ -147,7 +147,7 @@ def update():
 
 
 @app.route('/books/delete', methods=['POST'])
-def delete():
+def books_delete():
     title = request.form.get('title')
     book = Book.query.filter_by(title=title).first()
     db.session.delete(book)
