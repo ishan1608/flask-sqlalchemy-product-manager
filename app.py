@@ -105,6 +105,11 @@ def products_search():
         'objects': products
     })
 
+
+@app.route('/', methods=['GET'])
+def index():
+    return render_template('index.html', )
+
 ##################################
 # BOOKS
 ##################################
