@@ -7,6 +7,8 @@
     <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/underscore.js') }}"></script>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='js/util.js') }}"></script>
 </head>
 <body>
 <div class="container">
@@ -24,9 +26,13 @@
 </script>
 <script type="text/javascript">
     $(function() {
+        let offset = getUrlParameter('offset');
+        offset = isNaN(offset) ? 0 : offset;
+        let limit = getUrlParameter('limit');
+        limit = isNaN(limit) ? 10 : limit;
         $.ajax({
             method: 'GET',
-            url: {{ url_for('productresourcelist') }} + '?is_active=true',
+            url: {{ url_for('productresourcelist') }} + '?is_active=true&offset=' + offset + '&limit=' + limit,
         }).done(function (data) {
             $('#start-position').text(data.meta.offset);
             $('#end-position').text(data.meta.offset + data.meta.count);
