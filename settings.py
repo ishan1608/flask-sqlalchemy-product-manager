@@ -6,7 +6,9 @@ POSTGRES = {
     'port': '5432'
 }
 
-DATABASE_URL = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
+DATABASE_URL = (
+    'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
+)
 
 CELERY = {
     'CELERY_BROKER_URL': 'redis://localhost:6379',

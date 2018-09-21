@@ -1,5 +1,5 @@
 import pickledb
-from flask import request, abort, make_response
+from flask import request, abort, make_response, url_for
 from flask_restful import Resource
 from sqlalchemy import desc
 
@@ -70,8 +70,8 @@ class ProductResourceList(Resource):
                 'count': len(products),
                 'offset': offset,
                 'total_count': total_products_count,
-                'previous': '/product/?offset={}&limit={}'.format(offset - limit, limit) if (offset - limit) >= 0 else None,
-                'next': '/product/?offset={}&limit={}'.format(offset + limit, limit) if (offset + limit) < total_products_count else None
+                'previous': '{}?offset={}&limit={}'.format(url_for('productresourcelist'), offset - limit, limit) if (offset - limit) >= 0 else None,
+                'next': '{}?offset={}&limit={}'.format(url_for('productresourcelist'), offset + limit, limit) if (offset + limit) < total_products_count else None
             },
             'objects': products
         }
@@ -157,7 +157,7 @@ class BookResourceList(Resource):
     def post(self):
         title = request.form.get('title')
         if not title:
-            abort(400, description= 'Title cannot be blank')
+            abort(400, description='Title cannot be blank')
         book = Book(title=title)
         db.session.add(book)
         db.session.commit()
