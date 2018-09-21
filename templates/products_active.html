@@ -14,22 +14,30 @@
 <div class="container">
     <h1>Active Products (<span id="start-position"></span> -- <span id="end-position"></span>)</h1>
     <ul id="products-list"></ul>
+
+    <nav aria-label="Page navigation example">
+        <ul class="pagination">
+            <li class="page-item"><a id="previous-link" class="page-link" href="#">Previous</a></li>
+            <li class="page-item"><a id="next-link" class="page-link" href="#">Next</a></li>
+        </ul>
+    </nav>
 </div>
 <script type="text/html" id="ProductTmpl">
-<li>
-    <p>Name: <input type="text" id="name" value="<%= name %>"/></p>
-    <p>SKU: <input type="text" id="sku" value="<%= sku %>"/></p>
-    <p>Description: <input type="text" id="description" value="<%= description %>"/></p>
-    <p>Is Active: <input type="checkbox" id="is_active" checked="<%= is_active %>"/></p>
-    <input id="submit" type="submit" value="Update" data-id="<%= id %>"/>
-</li>
+    <li>
+        <p>Name: <input type="text" id="name" value="<%= name %>"/></p>
+        <p>SKU: <input type="text" id="sku" value="<%= sku %>"/></p>
+        <p>Description: <input type="text" id="description" value="<%= description %>"/></p>
+        <p>Is Active: <input type="checkbox" id="is_active" checked="<%= is_active %>"/></p>
+        <input id="submit" type="submit" value="Update" data-id="<%= id %>"/>
+    </li>
 </script>
 <script type="text/javascript">
-    $(function() {
+    $(function () {
         let offset = getUrlParameter('offset');
-        offset = isNaN(offset) ? 0 : offset;
+        offset = isNaN(offset) ? 0 : parseInt(offset);
         let limit = getUrlParameter('limit');
-        limit = isNaN(limit) ? 10 : limit;
+        limit = isNaN(limit) ? 10 : parseInt(limit);
+
         $.ajax({
             method: 'GET',
             url: {{ url_for('productresourcelist') }} + '?is_active=true&offset=' + offset + '&limit=' + limit,
@@ -38,9 +46,21 @@
             $('#end-position').text(data.meta.offset + data.meta.count);
 
             let productsList = $('#products-list');
-            _.each(data.objects, function(object) {
+            _.each(data.objects, function (object) {
                 productsList.append(_.template($('#ProductTmpl').html())(object));
             });
+
+            if (data.meta.previous) {
+                $('#previous-link').attr('href', window.location.pathname + '?offset=' + (offset - limit) + '&limit=' + limit);
+            } else {
+                $('#previous-link').css('visibility', 'hidden');
+            }
+
+            if (data.meta.next) {
+                $('#next-link').attr('href', window.location.pathname + '?offset=' + (offset + limit) + '&limit=' + limit);
+            } else {
+                $('#next-link').css('visibility', 'hidden');
+            }
         });
     });
 </script>
