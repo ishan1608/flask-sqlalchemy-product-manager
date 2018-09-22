@@ -9,8 +9,6 @@ import settings
 from app import create_app
 from models import Product
 
-config_db = pickledb.load(settings.CONFIG_DB, False)
-
 
 def make_celery(app):
     celery = Celery(app.import_name, backend=app.config['CELERY_RESULT_BACKEND'], broker=app.config['CELERY_BROKER_URL'])
@@ -36,7 +34,7 @@ app = create_app()
 celery = make_celery(app)
 
 
-@celery.task()
+@celery.task
 def process_csv(file_path):
     from models import Product
     from app import get_db
@@ -65,13 +63,14 @@ def process_csv(file_path):
                 app.logger.error(exception)
 
 
-@celery.task()
+@celery.task
 def post_product_webhook(product_id, action):
     product = Product.query.get(product_id)
     payload = {
         'action': action,
         'object': product.json()
     }
+    config_db = pickledb.load(settings.CONFIG_DB, False)
     webhook_config_url = config_db.get('webhook_config')
     if not webhook_config_url:
         return

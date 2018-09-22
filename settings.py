@@ -18,3 +18,9 @@ CELERY = {
 CELERY_ENABLED = True
 
 CONFIG_DB = 'config.db'
+
+# Importing local_settings.py
+try:
+    from local_settings import *
+except:
+    pass

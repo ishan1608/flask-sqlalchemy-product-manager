@@ -7,8 +7,6 @@ import settings
 from models import db, Book, Product
 from util import url_validator
 
-config_db = pickledb.load(settings.CONFIG_DB, False)
-
 
 class ProductResource(Resource):
     def get(self, product_id):
@@ -26,7 +24,8 @@ class ProductResource(Resource):
         product.sku = request.form.get('sku', product.sku)
         product.name = request.form.get('name', product.name)
         product.description = request.form.get('description', product.description)
-        product.is_active = request.form.get('is_active', product.is_active)
+        is_active = request.form.get('is_active')
+        product.is_active = product.is_active if not is_active else is_active.lower() == 'true'
         db.session.commit()
 
         # Trigger Webhook
@@ -34,7 +33,7 @@ class ProductResource(Resource):
         if settings.CELERY_ENABLED:
             post_product_webhook.apply_async(args=[product.id, action], queue='flask-crud-celery')
         else:
-            post_product_webhook(product, action)
+            post_product_webhook(product.id, action)
 
         return product.json()
 
@@ -101,19 +100,23 @@ class ProductResourceList(Resource):
         if settings.CELERY_ENABLED:
             post_product_webhook.apply_async(args=[product.id, action], queue='flask-crud-celery')
         else:
-            post_product_webhook(product, action)
+            post_product_webhook(product.id, action)
 
         return product.json()
 
 
 class WebhookConfigResource(Resource):
     def get(self):
+        config_db = pickledb.load(settings.CONFIG_DB, False)
+
         url = config_db.get('webhook_config')
         return {
             'object': url
         }
 
     def post(self):
+        config_db = pickledb.load(settings.CONFIG_DB, False)
+
         url = request.form.get('url')
         if not url_validator(url):
             abort(400, description='Invalid URL')
