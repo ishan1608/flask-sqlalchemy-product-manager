@@ -1,9 +1,9 @@
 import pickledb
+import requests
 from flask import request, abort, make_response, url_for
 from flask_restful import Resource
 from sqlalchemy import desc
 
-import requests
 import settings
 from models import db, Book, Product
 from util import url_validator

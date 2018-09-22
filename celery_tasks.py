@@ -1,13 +1,9 @@
 import csv
 
-import pickledb
-import requests
 from celery import Celery
 from sqlalchemy.exc import IntegrityError
 
-import settings
 from app import create_app
-from models import Product
 
 
 def make_celery(app):
@@ -65,17 +61,6 @@ def process_csv(file_path):
 
 @celery.task
 def post_product_webhook(product_id, action):
-    product = Product.query.get(product_id)
-    payload = {
-        'action': action,
-        'object': product.json()
-    }
-    config_db = pickledb.load(settings.CONFIG_DB, False)
-    webhook_config_url = config_db.get('webhook_config')
-    if not webhook_config_url:
-        return
+    from api import ProductResource
 
-    if action == 'update':
-        requests.put(webhook_config_url, json=payload)
-    else:
-        requests.post(webhook_config_url, json=payload)
+    ProductResource.post_product_webhook(product_id, action)
