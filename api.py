@@ -3,9 +3,12 @@ from flask import request, abort, make_response, url_for
 from flask_restful import Resource
 from sqlalchemy import desc
 
+import requests
 import settings
 from models import db, Book, Product
 from util import url_validator
+
+config_db = pickledb.load(settings.CONFIG_DB, False)
 
 
 class ProductResource(Resource):
@@ -33,9 +36,25 @@ class ProductResource(Resource):
         if settings.CELERY_ENABLED:
             post_product_webhook.apply_async(args=[product.id, action], queue='flask-crud-celery')
         else:
-            post_product_webhook(product.id, action)
+            self.post_product_webhook(product.id, action)
 
         return product.json()
+
+    @classmethod
+    def post_product_webhook(cls, product_id, action):
+        product = Product.query.get(product_id)
+        payload = {
+            'action': action,
+            'object': product.json()
+        }
+        webhook_config_url = config_db.get('webhook_config')
+        if not webhook_config_url:
+            return
+
+        if action == 'update':
+            requests.put(webhook_config_url, json=payload)
+        else:
+            requests.post(webhook_config_url, json=payload)
 
 
 class ProductResourceList(Resource):
@@ -107,16 +126,12 @@ class ProductResourceList(Resource):
 
 class WebhookConfigResource(Resource):
     def get(self):
-        config_db = pickledb.load(settings.CONFIG_DB, False)
-
         url = config_db.get('webhook_config')
         return {
             'object': url
         }
 
     def post(self):
-        config_db = pickledb.load(settings.CONFIG_DB, False)
-
         url = request.form.get('url')
         if not url_validator(url):
             abort(400, description='Invalid URL')
