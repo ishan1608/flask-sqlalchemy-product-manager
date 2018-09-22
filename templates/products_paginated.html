@@ -5,8 +5,11 @@
     <title>Products Import</title>
     <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"/>
     <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
+    <link href="{{ url_for('static', filename='css/toastr.min.css') }}" rel="stylesheet" media="screen"/>
+
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/underscore.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/toastr.min.js') }}"></script>
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/util.js') }}"></script>
 </head>
@@ -24,20 +27,41 @@
 </div>
 <script type="text/html" id="ProductTmpl">
     <li>
-        <p>Name: <input type="text" id="name" value="<%= name %>"/></p>
-        <p>SKU: <input type="text" id="sku" value="<%= sku %>"/></p>
-        <p>Description: <input type="text" id="description" value="<%= description %>"/></p>
-        <p>Is Active: <input type="checkbox" id="is_active" checked="<%= is_active %>"/></p>
-        <input id="submit" type="submit" value="Update" data-id="<%= id %>"/>
+        <p>Name: <input type="text" name="name" value="<%= name %>"/></p>
+        <p>SKU: <input type="text" name="sku" value="<%= sku %>"/></p>
+        <p>Description: <input type="text" name="description" value="<%= description %>"/></p>
+        <p>Is Active: <input type="checkbox" name="is_active" <%= is_active ? 'checked' : '' %>/></p>
+        <input type="submit" value="Update" name="submit" data-id="<%= id %>"/>
     </li>
 </script>
 <script type="text/javascript">
     $(function () {
+        // Initialize Toastr Options
+        toastr.options = {
+            'closeButton': true,
+            'debug': false,
+            'newestOnTop': true,
+            'progressBar': false,
+            'positionClass': 'toast-top-right',
+            'preventDuplicates': false,
+            'onclick': null,
+            'showDuration': '300',
+            'hideDuration': '1000',
+            'timeOut': '5000',
+            'extendedTimeOut': '1000',
+            'showEasing': 'swing',
+            'hideEasing': 'linear',
+            'showMethod': 'fadeIn',
+            'hideMethod': 'fadeOut'
+        };
+
+
         let offset = getUrlParameter('offset');
         offset = isNaN(offset) ? 0 : parseInt(offset);
         let limit = getUrlParameter('limit');
         limit = isNaN(limit) ? 10 : parseInt(limit);
 
+        // Display Products
         $.ajax({
             method: 'GET',
             url: {{ url_for('productresourcelist') }} + '?is_active={{ active_mode }}&offset=' + offset + '&limit=' + limit,
@@ -62,8 +86,43 @@
             } else {
                 $('#next-link').css('visibility', 'hidden');
             }
+
+            registerUpdateListener();
         });
     });
+
+    let registerUpdateListener = function() {
+        // Update Product
+        $(':input[name="submit"]').on('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+
+            let $elem = $(event.currentTarget);
+            let productId = $elem.attr('data-id');
+
+            let $productContainer = $elem.parent().parent();
+            let productName = $productContainer.find(':input[name="name"]').val();
+            let productSku = $productContainer.find(':input[name="sku"]').val();
+            let productDescription = $productContainer.find(':input[name="description"]').val();
+            let productIsActive = $productContainer.find(':input[name="is_active"]').is('checked');
+
+            $.ajax({
+                method: 'PUT',
+                url: {{ url_for('productresourcelist') }} + productId +'/',
+                data: {
+                    id: productId,
+                    is_active: productIsActive,
+                    name: productName,
+                    sku: productSku,
+                    description: productDescription
+                }
+            }).done(function (data) {
+                toastr['success']('Product ' + productId + ' Updated', 'Success');
+            }).fail(function() {
+                toastr["error"]('Failed Updating Product ' + productId, "Success")
+            });
+        });
+    };
 </script>
 </body>
 </html>
