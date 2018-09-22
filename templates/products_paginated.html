@@ -12,7 +12,7 @@
 </head>
 <body>
 <div class="container">
-    <h1>Active Products (<span id="start-position"></span> -- <span id="end-position"></span>)</h1>
+    <h1>{% if active_mode %}Active{% else %}Inactive{% endif %} Products (<span id="start-position"></span> -- <span id="end-position"></span>)</h1>
     <ul id="products-list"></ul>
 
     <nav aria-label="Page navigation example">
@@ -40,10 +40,11 @@
 
         $.ajax({
             method: 'GET',
-            url: {{ url_for('productresourcelist') }} + '?is_active=true&offset=' + offset + '&limit=' + limit,
+            url: {{ url_for('productresourcelist') }} + '?is_active={{ active_mode }}&offset=' + offset + '&limit=' + limit,
         }).done(function (data) {
-            $('#start-position').text(data.meta.offset);
-            $('#end-position').text(data.meta.offset + data.meta.count);
+            $('#start-position').text(data.meta.offset <= data.meta.total_count ? data.meta.offset : data.meta.total_count);
+            let endCount = data.meta.offset + data.meta.count;
+            $('#end-position').text(endCount <= data.meta.total_count ? endCount : data.meta.total_count);
 
             let productsList = $('#products-list');
             _.each(data.objects, function (object) {

@@ -117,7 +117,12 @@ def index():
 
 @app.route('/products/active', methods=['GET'])
 def products_active():
-    return render_template('products_active.html')
+    return render_template('products_paginated.html', active_mode=True)
+
+
+@app.route('/products/inactive', methods=['GET'])
+def products_inactive():
+    return render_template('products_paginated.html', active_mode=False)
 
 ##################################
 # BOOKS
