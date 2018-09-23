@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Product Manager</title>
+    <title>{% block title %}Product Manager{% endblock title %}</title>
 
     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" media="screen"/>
+    <link href="{{ url_for('static', filename='css/toastr.min.css') }}" rel="stylesheet" media="screen"/>
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/underscore.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/toastr.min.js') }}"></script>
+
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/util.js') }}"></script>
 </head>
 <body>
 <div class="container">
