@@ -36,28 +36,9 @@ def get_db():
 app = create_app()
 api = Api(app)
 
-tm = tus_manager(app, upload_url='/products-csv-upload', upload_folder='uploads/')
-
-
-@tm.upload_file_handler
-def upload_file_hander(upload_file_path, filename):
-    from celery_tasks import process_csv
-
-    if settings.CELERY_ENABLED:
-        process_csv.apply_async(args=[upload_file_path], queue='flask-crud-celery')
-    else:
-        process_csv(upload_file_path)
-    return filename
-
-
 api.add_resource(ProductResource, '/product/<int:product_id>/')
 api.add_resource(ProductResourceList, '/product/')
 api.add_resource(WebhookConfigResource, '/webhook-config/')
-
-
-@app.route('/products/import/', methods=['GET'])
-def products_import():
-    return render_template('products_import.html', tm=tm)
 
 
 @app.route('/products/search/', methods=['GET'])
@@ -105,8 +86,9 @@ def products_search():
         'objects': products
     })
 
+
 ##################################
-# BOOKS
+# Product Pages
 ##################################
 
 
@@ -123,6 +105,36 @@ def products_active():
 @app.route('/products/inactive', methods=['GET'])
 def products_inactive():
     return render_template('products_paginated.html', active_mode=False)
+
+
+@app.route('/products/create', methods=['GET'])
+def products_create():
+    return render_template('products_create.html')
+
+
+##################################
+# Import
+##################################
+
+
+tm = tus_manager(app, upload_url='/products-csv-upload', upload_folder='uploads/')
+
+
+@tm.upload_file_handler
+def upload_file_hander(upload_file_path, filename):
+    from celery_tasks import process_csv
+
+    if settings.CELERY_ENABLED:
+        process_csv.apply_async(args=[upload_file_path], queue='flask-crud-celery')
+    else:
+        process_csv(upload_file_path)
+    return filename
+
+
+@app.route('/products/import/', methods=['GET'])
+def products_import():
+    return render_template('products_import.html', tm=tm)
+
 
 ##################################
 # BOOKS

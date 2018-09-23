@@ -100,7 +100,9 @@ class ProductResourceList(Resource):
         sku = request.form.get('sku')
         name = request.form.get('name')
         description = request.form.get('description', '')
-        is_active = request.form.get('is_active', True)
+        is_active = request.form.get('is_active')
+        is_active = True if not is_active else is_active.lower() == 'true'
+
         if not sku:
             abort(400, description='SKU cannot be blank')
         if not name:
