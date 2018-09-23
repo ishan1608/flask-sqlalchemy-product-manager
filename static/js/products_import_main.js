@@ -3,14 +3,14 @@
 
 "use strict";
 
-var upload = null;
-var uploadIsRunning = false;
-var toggleBtn = document.querySelector("#toggle-btn");
-var input = document.querySelector("input[type=file]");
-var progress = document.querySelector(".progress");
-var progressBar = progress.querySelector(".bar");
-var alertBox = document.querySelector("#support-alert");
-var uploadResult = document.querySelector("#upload-result");
+let upload = null;
+let uploadIsRunning = false;
+const toggleBtn = document.querySelector("#toggle-btn");
+const input = document.querySelector("input[type=file]");
+const progress = document.querySelector(".progress");
+const progressBar = progress.querySelector(".bar");
+const alertBox = document.querySelector("#support-alert");
+const uploadResult = document.querySelector("#upload-result");
 
 // Initialize Toastr Options
 toastr.options = {
@@ -60,7 +60,7 @@ toggleBtn.addEventListener("click", function (e) {
 input.addEventListener("change", startUpload);
 
 function startUpload() {
-    var file = input.files[0];
+    let file = input.files[0];
     // Only continue if a file has actually been selected.
     // IE will trigger a change event even if we reset the input element
     // using reset() and we do not want to blow up later.
@@ -70,7 +70,7 @@ function startUpload() {
 
     toggleBtn.textContent = "pause upload";
 
-    var options = {
+    let options = {
         endpoint: '/products-csv-upload',
         resume: true,
         chunkSize: Infinity,
@@ -83,7 +83,7 @@ function startUpload() {
             if (error.originalRequest) {
                 console.log(error);
                 toastr.options.showDuration = 5000;
-                toastr.options.onclick = function() {
+                toastr.options.onclick = function () {
                     console.log('retry requested');
                     upload.start();
                     uploadIsRunning = true;
@@ -99,7 +99,7 @@ function startUpload() {
             reset();
         },
         onProgress: function (bytesUploaded, bytesTotal) {
-            var percentage = (bytesUploaded / bytesTotal * 100).toFixed(2);
+            let percentage = (bytesUploaded / bytesTotal * 100).toFixed(2);
             progressBar.style.width = percentage + "%";
             console.log(bytesUploaded, bytesTotal, percentage + "%");
         },
