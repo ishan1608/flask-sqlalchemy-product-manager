@@ -1,11 +1,17 @@
 {% extends 'app_base.html' %}
+
 {% block navigation %}
     {% with page_type='index' %}
         {% include 'nav_bar.html' %}
     {% endwith %}
 {% endblock navigation %}
+
 {% block page_content %}
     <div class="container">
         <h2>Search</h2>
     </div>
-{% endblock %}
+{% endblock page_content %}
+
+{#{% block page_js %}#}
+{#    <script type="text/javascript" src="{{ url_for('static', filename='js/navigation.js') }}"></script>#}
+{#{% endblock page_js %}#}

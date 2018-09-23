@@ -25,6 +25,9 @@
 </div>
 {% block page_content %}
 {% endblock %}
-<script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% include 'product_box.html' %}
+{% block page_js %}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/navigation.js') }}"></script>
+{% endblock page_js %}
 </body>
 </html>

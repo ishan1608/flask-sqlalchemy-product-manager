@@ -1,120 +1,124 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Products Import</title>
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" media="screen"/>
-    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
-    <link href="{{ url_for('static', filename='css/toastr.min.css') }}" rel="stylesheet" media="screen"/>
+{% extends 'app_base.html' %}
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/underscore.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/toastr.min.js') }}"></script>
+{% block title %}{% if active_mode %}Active{% else %}Inactive{% endif %} Products | Product Manager{% endblock title %}
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/util.js') }}"></script>
-</head>
-<body>
-<div class="container">
-    <h1>{% if active_mode %}Active{% else %}Inactive{% endif %} Products (<span id="start-position"></span> -- <span id="end-position"></span>)</h1>
-    <div id="products-list"></div>
+{% block navigation %}
+    {% if active_mode %}
+        {% with page_type='products_active' %}
+            {% include 'nav_bar.html' %}
+        {% endwith %}
+    {% else %}
+        {% with page_type='products_inactive' %}
+            {% include 'nav_bar.html' %}
+        {% endwith %}
+    {% endif %}
+{% endblock navigation %}
 
-    <nav aria-label="Page navigation example">
-        <ul class="pagination">
-            <li class="page-item"><a id="previous-link" class="page-link" href="#">Previous</a></li>
-            <li class="page-item"><a id="next-link" class="page-link" href="#">Next</a></li>
-        </ul>
-    </nav>
-</div>
-{% include 'product_box.html' %}
-<script type="text/javascript">
-    $(function () {
-        // Initialize Toastr Options
-        toastr.options = {
-            'closeButton': true,
-            'debug': false,
-            'newestOnTop': true,
-            'progressBar': false,
-            'positionClass': 'toast-top-right',
-            'preventDuplicates': false,
-            'onclick': null,
-            'showDuration': '300',
-            'hideDuration': '1000',
-            'timeOut': '5000',
-            'extendedTimeOut': '1000',
-            'showEasing': 'swing',
-            'hideEasing': 'linear',
-            'showMethod': 'fadeIn',
-            'hideMethod': 'fadeOut'
-        };
+{% block page_content %}
+    <div class="container">
+        <h1>{% if active_mode %}Active{% else %}Inactive{% endif %} Products (<span id="start-position"></span> -- <span id="end-position"></span>)
+        </h1>
+        <div id="products-list"></div>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li class="page-item"><a id="previous-link" class="page-link" href="#">Previous</a></li>
+                <li class="page-item"><a id="next-link" class="page-link" href="#">Next</a></li>
+            </ul>
+        </nav>
+    </div>
+{% endblock page_content %}
+
+{% block page_js %}
+    {{ super() }}
+    <script type="text/javascript">
+        $(function () {
+            // Initialize Toastr Options
+            toastr.options = {
+                'closeButton': true,
+                'debug': false,
+                'newestOnTop': true,
+                'progressBar': false,
+                'positionClass': 'toast-top-right',
+                'preventDuplicates': false,
+                'onclick': null,
+                'showDuration': '300',
+                'hideDuration': '1000',
+                'timeOut': '5000',
+                'extendedTimeOut': '1000',
+                'showEasing': 'swing',
+                'hideEasing': 'linear',
+                'showMethod': 'fadeIn',
+                'hideMethod': 'fadeOut'
+            };
 
 
-        let offset = getUrlParameter('offset');
-        offset = isNaN(offset) ? 0 : parseInt(offset);
-        let limit = getUrlParameter('limit');
-        limit = isNaN(limit) ? 10 : parseInt(limit);
+            let offset = getUrlParameter('offset');
+            offset = isNaN(offset) ? 0 : parseInt(offset);
+            let limit = getUrlParameter('limit');
+            limit = isNaN(limit) ? 10 : parseInt(limit);
 
-        // Display Products
-        $.ajax({
-            method: 'GET',
-            url: {{ url_for('productresourcelist') }} +'?is_active={{ active_mode }}&offset=' + offset + '&limit=' + limit,
-        }).done(function (data) {
-            $('#start-position').text(data.meta.offset <= data.meta.total_count ? data.meta.offset : data.meta.total_count);
-            let endCount = data.meta.offset + data.meta.count;
-            $('#end-position').text(endCount <= data.meta.total_count ? endCount : data.meta.total_count);
-
-            let productsList = $('#products-list');
-            _.each(data.objects, function (object) {
-                productsList.append(_.template($('#ProductTmpl').html())(object));
-            });
-
-            if (data.meta.previous) {
-                $('#previous-link').attr('href', window.location.pathname + '?offset=' + (offset - limit) + '&limit=' + limit);
-            } else {
-                $('#previous-link').css('visibility', 'hidden');
-            }
-
-            if (data.meta.next) {
-                $('#next-link').attr('href', window.location.pathname + '?offset=' + (offset + limit) + '&limit=' + limit);
-            } else {
-                $('#next-link').css('visibility', 'hidden');
-            }
-
-            registerUpdateListener();
-        });
-    });
-
-    let registerUpdateListener = function () {
-        // Update Product
-        $(':input[name="submit"]').on('click', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
-
-            let $elem = $(event.currentTarget);
-            let productId = $elem.attr('data-id');
-
-            let $productContainer = $elem.parent();
-            let productName = $productContainer.find(':input[name="name"]').val();
-            let productSku = $productContainer.find(':input[name="sku"]').val();
-            let productDescription = $productContainer.find(':input[name="description"]').val();
-            let productIsActive = $productContainer.find(':input[name="is_active"]').prop('checked');
-
+            // Display Products
             $.ajax({
-                method: 'PUT',
-                url: {{ url_for('productresourcelist') }} +productId + '/',
-                data: {
-                    id: productId,
-                    is_active: productIsActive,
-                    name: productName,
-                    sku: productSku,
-                    description: productDescription
-                }
+                method: 'GET',
+                url: {{ url_for('productresourcelist') }} +'?is_active={{ active_mode }}&offset=' + offset + '&limit=' + limit,
             }).done(function (data) {
-                toastr['success']('Product ' + productId + ' Updated', 'Success');
-            }).fail(function () {
-                toastr["error"]('Failed Updating Product ' + productId, "Success")
+                $('#start-position').text(data.meta.offset <= data.meta.total_count ? data.meta.offset : data.meta.total_count);
+                let endCount = data.meta.offset + data.meta.count;
+                $('#end-position').text(endCount <= data.meta.total_count ? endCount : data.meta.total_count);
+
+                let productsList = $('#products-list');
+                _.each(data.objects, function (object) {
+                    productsList.append(_.template($('#ProductTmpl').html())(object));
+                });
+
+                if (data.meta.previous) {
+                    $('#previous-link').attr('href', window.location.pathname + '?offset=' + (offset - limit) + '&limit=' + limit);
+                } else {
+                    $('#previous-link').css('visibility', 'hidden');
+                }
+
+                if (data.meta.next) {
+                    $('#next-link').attr('href', window.location.pathname + '?offset=' + (offset + limit) + '&limit=' + limit);
+                } else {
+                    $('#next-link').css('visibility', 'hidden');
+                }
+
+                registerUpdateListener();
             });
         });
-    };
-</script>
-</body>
-</html>
+
+        let registerUpdateListener = function () {
+            // Update Product
+            $(':input[name="submit"]').on('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
+
+                let $elem = $(event.currentTarget);
+                let productId = $elem.attr('data-id');
+
+                let $productContainer = $elem.parent();
+                let productName = $productContainer.find(':input[name="name"]').val();
+                let productSku = $productContainer.find(':input[name="sku"]').val();
+                let productDescription = $productContainer.find(':input[name="description"]').val();
+                let productIsActive = $productContainer.find(':input[name="is_active"]').prop('checked');
+
+                $.ajax({
+                    method: 'PUT',
+                    url: {{ url_for('productresourcelist') }} +productId + '/',
+                    data: {
+                        id: productId,
+                        is_active: productIsActive,
+                        name: productName,
+                        sku: productSku,
+                        description: productDescription
+                    }
+                }).done(function (data) {
+                    toastr['success']('Product ' + productId + ' Updated', 'Success');
+                }).fail(function () {
+                    toastr["error"]('Failed Updating Product ' + productId, "Success")
+                });
+            });
+        };
+    </script>
+{% endblock page_js %}
