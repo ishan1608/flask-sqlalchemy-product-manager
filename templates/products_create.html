@@ -1,82 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Products Import</title>
-    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" media="screen"/>
-    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
-    <link href="{{ url_for('static', filename='css/toastr.min.css') }}" rel="stylesheet" media="screen"/>
-    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
+{% extends 'app_base.html' %}
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/underscore.js') }}"></script>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/toastr.min.js') }}"></script>
+{% block title %}Add | Product Manager{% endblock title %}
 
-    <script type="text/javascript" src="{{ url_for('static', filename='js/util.js') }}"></script>
-</head>
-<body>
-<div class="container">
-    <div id="product-create"></div>
-</div>
-{% include 'product_box.html' %}
-<script type="text/javascript">
-    $(function () {
-        // Initialize Toastr Options
-        toastr.options = {
-            'closeButton': true,
-            'debug': false,
-            'newestOnTop': true,
-            'progressBar': false,
-            'positionClass': 'toast-top-right',
-            'preventDuplicates': false,
-            'onclick': null,
-            'showDuration': '300',
-            'hideDuration': '1000',
-            'timeOut': '5000',
-            'extendedTimeOut': '1000',
-            'showEasing': 'swing',
-            'hideEasing': 'linear',
-            'showMethod': 'fadeIn',
-            'hideMethod': 'fadeOut'
-        };
+{% block navigation %}
+    {% with page_type='products_create' %}
+        {% include 'nav_bar.html' %}
+    {% endwith %}
+{% endblock navigation %}
 
-        // Insert Product Box
-        $('#product-create').html(_.template($('#ProductTmpl').html())({
-            sku: null,
-            description: null,
-            is_active: true,
-            id: null
-        }));
+{% block page_content %}
+    <div class="container">
+        <div id="product-create"></div>
+    </div>
+{% endblock page_content %}
 
-        // Create Product
-        $(':input[name="submit"]').on('click', function (event) {
-            event.preventDefault();
-            event.stopPropagation();
+{% block page_js %}
+    {{ super() }}
+    <script type="text/javascript">
+        $(function () {
+            // Initialize Toastr Options
+            toastr.options = {
+                'closeButton': true,
+                'debug': false,
+                'newestOnTop': true,
+                'progressBar': false,
+                'positionClass': 'toast-top-right',
+                'preventDuplicates': false,
+                'onclick': null,
+                'showDuration': '300',
+                'hideDuration': '1000',
+                'timeOut': '5000',
+                'extendedTimeOut': '1000',
+                'showEasing': 'swing',
+                'hideEasing': 'linear',
+                'showMethod': 'fadeIn',
+                'hideMethod': 'fadeOut'
+            };
 
-            let $elem = $(event.currentTarget);
+            // Insert Product Box
+            $('#product-create').html(_.template($('#ProductTmpl').html())({
+                sku: null,
+                description: null,
+                is_active: true,
+                id: null
+            }));
 
-            let $productContainer = $elem.parent();
-            let productName = $productContainer.find(':input[name="name"]').val();
-            let productSku = $productContainer.find(':input[name="sku"]').val();
-            let productDescription = $productContainer.find(':input[name="description"]').val();
-            let productIsActive = $productContainer.find(':input[name="is_active"]').prop('checked');
+            // Create Product
+            $(':input[name="submit"]').on('click', function (event) {
+                event.preventDefault();
+                event.stopPropagation();
 
-            $.ajax({
-                method: 'POST',
-                url: {{ url_for('productresourcelist') }},
-                data: {
-                    is_active: productIsActive,
-                    name: productName,
-                    sku: productSku,
-                    description: productDescription
-                }
-            }).done(function (data) {
-                toastr['success']('Product ' + data.id + ' Created', 'Success');
-            }).fail(function () {
-                toastr["error"]('Failed Creating Product', "Success")
+                let $elem = $(event.currentTarget);
+
+                let $productContainer = $elem.parent();
+                let productName = $productContainer.find(':input[name="name"]').val();
+                let productSku = $productContainer.find(':input[name="sku"]').val();
+                let productDescription = $productContainer.find(':input[name="description"]').val();
+                let productIsActive = $productContainer.find(':input[name="is_active"]').prop('checked');
+
+                $.ajax({
+                    method: 'POST',
+                    url: {{ url_for('productresourcelist') }},
+                    data: {
+                        is_active: productIsActive,
+                        name: productName,
+                        sku: productSku,
+                        description: productDescription
+                    }
+                }).done(function (data) {
+                    toastr['success']('Product ' + data.id + ' Created', 'Success');
+                }).fail(function () {
+                    toastr["error"]('Failed Creating Product', "Success")
+                });
             });
         });
-    });
-</script>
-</body>
-</html>
+    </script>
+{% endblock page_js %}

@@ -9,6 +9,9 @@
         <a class="nav-link {% if page_type == 'products_inactive' %}active{% endif %}" href="{{ url_for('products_inactive') }}">InActive Products: <span id="inactive-product-count"></span></a>
     </li>
     <li class="nav-item">
+        <a class="nav-link {% if page_type == 'products_create' %}active{% endif %}" href="{{ url_for('products_create') }}">Add</a>
+    </li>
+    <li class="nav-item">
         <a class="nav-link {% if page_type == 'products_import' %}active{% endif %}" href="{{ url_for('products_import') }}">Upload</a>
     </li>
 </ul>
