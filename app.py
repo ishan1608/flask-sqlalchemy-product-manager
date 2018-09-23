@@ -55,12 +55,12 @@ api.add_resource(ProductResourceList, '/product/')
 api.add_resource(WebhookConfigResource, '/webhook-config/')
 
 
-@app.route('/product/import/', methods=['GET'])
+@app.route('/products/import/', methods=['GET'])
 def products_import():
     return render_template('products_import.html', tm=tm)
 
 
-@app.route('/product/search/', methods=['GET'])
+@app.route('/products/search/', methods=['GET'])
 def products_search():
     from models import Product
 

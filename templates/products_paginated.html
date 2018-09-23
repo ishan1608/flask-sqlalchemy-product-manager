@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Products Import</title>
-    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"/>
+    <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet" media="screen"/>
     <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
     <link href="{{ url_for('static', filename='css/toastr.min.css') }}" rel="stylesheet" media="screen"/>
+    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/underscore.js') }}"></script>
@@ -16,7 +17,7 @@
 <body>
 <div class="container">
     <h1>{% if active_mode %}Active{% else %}Inactive{% endif %} Products (<span id="start-position"></span> -- <span id="end-position"></span>)</h1>
-    <ul id="products-list"></ul>
+    <div id="products-list"></div>
 
     <nav aria-label="Page navigation example">
         <ul class="pagination">
@@ -26,13 +27,25 @@
     </nav>
 </div>
 <script type="text/html" id="ProductTmpl">
-    <li>
-        <p>Name: <input type="text" name="name" value="<%= name %>"/></p>
-        <p>SKU: <input type="text" name="sku" value="<%= sku %>"/></p>
-        <p>Description: <input type="text" name="description" value="<%= description %>"/></p>
-        <p>Is Active: <input type="checkbox" name="is_active" <%= is_active ? 'checked' : '' %>/></p>
-        <input type="submit" value="Update" name="submit" data-id="<%= id %>"/>
-    </li>
+    <div class="shadow-lg p-3 mb-5 bg-white rounded">
+        <div class="form-group">
+            <label for="name">Name</label>
+            <input type="text" class="form-control" id="name" name="name" value="<%= name %>" placeholder="Enter Name"/>
+        </div>
+        <div class="form-group">
+            <label for="sku">SKU</label>
+            <input type="text" class="form-control" id="sku" name="sku" value="<%= sku %>" placeholder="Enter SKU">
+        </div>
+        <div class="form-group">
+            <label for="description">Description</label>
+            <input type="text" class="form-control" id="description" name="description" value="<%= description %>" placeholder="Enter Description">
+        </div>
+        <div class="form-check">
+            <input type="checkbox" class="form-check-input" id="is_active" name="is_active" <%= is_active ? 'checked' : '' %>>
+            <label class="form-check-label" for="is_active">Active ?</label>
+        </div>
+        <button type="submit" class="btn btn-primary" name="submit" data-id="<%= id %>">Submit</button>
+    </div>
 </script>
 <script type="text/javascript">
     $(function () {
@@ -64,7 +77,7 @@
         // Display Products
         $.ajax({
             method: 'GET',
-            url: {{ url_for('productresourcelist') }} + '?is_active={{ active_mode }}&offset=' + offset + '&limit=' + limit,
+            url: {{ url_for('productresourcelist') }} +'?is_active={{ active_mode }}&offset=' + offset + '&limit=' + limit,
         }).done(function (data) {
             $('#start-position').text(data.meta.offset <= data.meta.total_count ? data.meta.offset : data.meta.total_count);
             let endCount = data.meta.offset + data.meta.count;
@@ -91,24 +104,24 @@
         });
     });
 
-    let registerUpdateListener = function() {
+    let registerUpdateListener = function () {
         // Update Product
-        $(':input[name="submit"]').on('click', function(event) {
+        $(':input[name="submit"]').on('click', function (event) {
             event.preventDefault();
             event.stopPropagation();
 
             let $elem = $(event.currentTarget);
             let productId = $elem.attr('data-id');
 
-            let $productContainer = $elem.parent().parent();
+            let $productContainer = $elem.parent();
             let productName = $productContainer.find(':input[name="name"]').val();
             let productSku = $productContainer.find(':input[name="sku"]').val();
             let productDescription = $productContainer.find(':input[name="description"]').val();
-            let productIsActive = $productContainer.find(':input[name="is_active"]').is('checked');
+            let productIsActive = $productContainer.find(':input[name="is_active"]').prop('checked');
 
             $.ajax({
                 method: 'PUT',
-                url: {{ url_for('productresourcelist') }} + productId +'/',
+                url: {{ url_for('productresourcelist') }} +productId + '/',
                 data: {
                     id: productId,
                     is_active: productIsActive,
@@ -118,7 +131,7 @@
                 }
             }).done(function (data) {
                 toastr['success']('Product ' + productId + ' Updated', 'Success');
-            }).fail(function() {
+            }).fail(function () {
                 toastr["error"]('Failed Updating Product ' + productId, "Success")
             });
         });
