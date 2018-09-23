@@ -1,9 +1,11 @@
 {% extends 'app_base.html' %}
+{% block navigation %}
+    {% with page_type='index' %}
+        {% include 'nav_bar.html' %}
+    {% endwith %}
+{% endblock navigation %}
 {% block page_content %}
     <div class="container">
-        {% with page_type='index' %}
-            {% include 'nav_bar.html' %}
-        {% endwith %}
         <h2>Search</h2>
     </div>
 {% endblock %}

@@ -11,6 +11,11 @@
 <body>
 <div class="container">
     <h1>Product Manager</h1>
+    {% block navigation %}
+        {% with page_type='index' %}
+            {% include 'nav_bar.html' %}
+        {% endwith %}
+    {% endblock navigation %}
 </div>
 {% block page_content %}
 {% endblock %}
