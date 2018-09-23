@@ -1,18 +1,9 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Product Manager</title>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
-</head>
-<body>
-<h1>Product Manager</h1>
-<p>
-    <a href="{{ url_for('products_active') }}">Active Products: <span id="active-product-count"></span></a>
-</p>
-<p>
-    <a href="{{ url_for('products_inactive') }}">InActive Products: <span id="inactive-product-count"></span></a>
-</p>
-<script type="text/javascript" src="{{ url_for('static', filename='js/main.js') }}"></script>
-</body>
-</html>
+{% extends 'app_base.html' %}
+{% block page_content %}
+    <div class="container">
+        {% with page_type='index' %}
+            {% include 'nav_bar.html' %}
+        {% endwith %}
+        <h2>Search</h2>
+    </div>
+{% endblock %}
