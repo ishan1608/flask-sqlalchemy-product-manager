@@ -9,10 +9,13 @@
 
     <script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.3.1.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/underscore.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/popper.min.js') }}"></script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/toastr.min.js') }}"></script>
 
-    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
-    <script type="text/javascript" src="{{ url_for('static', filename='js/util.js') }}"></script>
+    {% block page_css %}
+        <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
+    {% endblock page_css %}
 </head>
 <body>
 <div class="container">
@@ -27,6 +30,13 @@
 {% endblock %}
 {% include 'product_box.html' %}
 {% block page_js %}
+    <script type="text/javascript">
+        var ISG = ISG || {};
+        ISG.searchUrl = "{{ url_for('products_search') }}";
+        ISG.productResourceListUrl = "{{ url_for('productresourcelist') }}";
+
+    </script>
+    <script type="text/javascript" src="{{ url_for('static', filename='js/util.js') }}"></script>
     <script type="text/javascript" src="{{ url_for('static', filename='js/navigation.js') }}"></script>
 {% endblock page_js %}
 </body>

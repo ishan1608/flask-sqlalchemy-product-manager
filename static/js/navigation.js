@@ -1,8 +1,8 @@
 // Global
-ISG = {};
+var ISG = ISG || {};
 
 ISG.updateCount = function(type, count) {
-    var selector;
+    let selector;
     switch (type) {
         case 'active':
             selector = $('#active-product-count');
