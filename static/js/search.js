@@ -15,6 +15,12 @@ $(function() {
         $searchButton.attr('data-type', $item.attr('data-type'));
     });
 
+    $searchInput.keypress(function(e){
+        if(e.which === 13) { //Enter key pressed
+            $searchButton.click();
+        }
+    });
+
     // Execute search
     $searchButton.on('click', function(event) {
         event.preventDefault();
@@ -32,7 +38,7 @@ $(function() {
                 break;
         }
 
-        // Display Products
+        // Display Products after Search
         $.ajax({
             method: 'GET',
             url: ISG.searchUrl +'?' + $.param(queryParams),
