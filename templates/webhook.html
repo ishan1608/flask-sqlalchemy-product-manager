@@ -1,0 +1,29 @@
+{% extends 'app_base.html' %}
+
+{% block navigation %}
+    {% with page_type='webhook' %}
+        {% include 'nav_bar.html' %}
+    {% endwith %}
+{% endblock navigation %}
+
+{% block page_css %}
+    {{ super() }}
+{% endblock page_css %}
+
+{% block page_content %}
+    <div class="container">
+        <h2>Webhook</h2>
+        <div class="shadow-lg p-3 mb-5 bg-white rounded">
+            <div class="form-group">
+                <label for="webhook-url">Webhook URL</label>
+                <input type="text" class="form-control" id="webhook-url" name="webhook-url" placeholder="Enter URL"/>
+            </div>
+            <button id="webhook-url-submit" type="submit" class="btn btn-primary" name="submit">Submit</button>
+        </div>
+    </div>
+{% endblock page_content %}
+
+{% block page_js %}
+    {{ super() }}
+    <script type="text/javascript" src="{{ url_for('static', filename='js/webhook.js') }}"></script>
+{% endblock page_js %}

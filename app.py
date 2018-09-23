@@ -41,52 +41,6 @@ api.add_resource(ProductResourceList, '/product/')
 api.add_resource(WebhookConfigResource, '/webhook-config/')
 
 
-@app.route('/products/search/', methods=['GET'])
-def products_search():
-    from models import Product
-
-    query = request.args.get('query', '')
-    field = request.args.get('field')
-    offset = int(request.args.get('offset', 0))
-    limit = int(request.args.get('limit', 10))
-
-    if offset < 0 or limit <= 0:
-        return Response(
-            response=json.dumps(dict(description='Invalid offset or limit')),
-            status=400,
-            mimetype='application/json'
-        )
-
-    searchable_fields = [field.key for field in inspect(Product).attrs if field.key not in ['id', 'is_active']]
-    if field and field not in searchable_fields:
-        return Response(
-            response=json.dumps(dict(description='Field: "{}" is not valid'.format(field))),
-            status=400,
-            mimetype='application/json'
-        )
-
-    if not field:
-        products = Product.query.order_by(Product.id).filter(or_(
-            Product.name.contains(query),
-            Product.sku.contains(query),
-            Product.description.contains(query)
-        ))
-    else:
-        products = Product.query.order_by(desc(Product.id)).filter(getattr(Product, field).contains(query))
-
-    total_products_count = products.count()
-    products = [product.json() for product in products.slice(offset, offset + limit)]
-    return jsonify({
-        'meta': {
-            'count': len(products),
-            'total_count': total_products_count,
-            'previous': '/product/?offset={}&limit={}'.format(offset - limit, limit) if (offset - limit) >= 0 else None,
-            'next': '/product/?offset={}&limit={}'.format(offset + limit, limit) if (offset + limit) < total_products_count else None
-        },
-        'objects': products
-    })
-
-
 ##################################
 # Product Pages
 ##################################
@@ -134,6 +88,66 @@ def upload_file_hander(upload_file_path, filename):
 @app.route('/products/import/', methods=['GET'])
 def products_import():
     return render_template('products_import.html', tm=tm)
+
+
+##################################
+# Search
+##################################
+
+
+@app.route('/products/search/', methods=['GET'])
+def products_search():
+    from models import Product
+
+    query = request.args.get('query', '')
+    field = request.args.get('field')
+    offset = int(request.args.get('offset', 0))
+    limit = int(request.args.get('limit', 10))
+
+    if offset < 0 or limit <= 0:
+        return Response(
+            response=json.dumps(dict(description='Invalid offset or limit')),
+            status=400,
+            mimetype='application/json'
+        )
+
+    searchable_fields = [field.key for field in inspect(Product).attrs if field.key not in ['id', 'is_active']]
+    if field and field not in searchable_fields:
+        return Response(
+            response=json.dumps(dict(description='Field: "{}" is not valid'.format(field))),
+            status=400,
+            mimetype='application/json'
+        )
+
+    if not field:
+        products = Product.query.order_by(Product.id).filter(or_(
+            Product.name.contains(query),
+            Product.sku.contains(query),
+            Product.description.contains(query)
+        ))
+    else:
+        products = Product.query.order_by(desc(Product.id)).filter(getattr(Product, field).contains(query))
+
+    total_products_count = products.count()
+    products = [product.json() for product in products.slice(offset, offset + limit)]
+    return jsonify({
+        'meta': {
+            'count': len(products),
+            'total_count': total_products_count,
+            'previous': '/product/?offset={}&limit={}'.format(offset - limit, limit) if (offset - limit) >= 0 else None,
+            'next': '/product/?offset={}&limit={}'.format(offset + limit, limit) if (offset + limit) < total_products_count else None
+        },
+        'objects': products
+    })
+
+
+##################################
+# Webhook Config
+##################################
+
+@app.route('/webhook', methods=['GET'])
+def webhook():
+    return render_template('webhook.html')
 
 
 ##################################
