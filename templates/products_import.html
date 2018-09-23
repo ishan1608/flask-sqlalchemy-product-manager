@@ -1,50 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Products Import</title>
-    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"/>
-    <link href="{{ url_for('static', filename='css/main.css') }}" rel="stylesheet" media="screen"/>
-</head>
-<body>
-<div class="container">
-    <h1>Products Import (CSV)</h1>
+{% extends 'app_base.html' %}
 
-    <p>
-    <h3>Upload products in bulk through a CSV file.</h3>
-    <br/>
-    NOTE: SKU should be unique. If duplicate, then the older entry will be kept while discarding the newer entry.
-    </p>
+{% block title %}Import | Product Manager{% endblock title %}
 
-    <div class="alert alert-warining hidden" id="support-alert">
-        <b>Warning!</b> Your browser does not seem to support the features necessary to run tus-js-client. The buttons below may work but probably
-        will fail silently.
-    </div>
+{% block navigation %}
+    {% with page_type='products_import' %}
+        {% include 'nav_bar.html' %}
+    {% endwith %}
+{% endblock navigation %}
 
-    <br/>
+{% block page_content %}
+    <div class="container">
+        <h2>Products Import (CSV)</h2>
 
-    <input type="file">
+        <p>
+        <h3>Upload products in bulk through a CSV file.</h3>
+        <br/>
+        NOTE: SKU should be unique. If duplicate, then the older entry will be kept while discarding the newer entry.
+        </p>
 
-    <br/>
-    <br/>
+        <div class="alert alert-warining hidden" id="support-alert">
+            <b>Warning!</b> Your browser does not seem to support the features necessary to run tus-js-client. The buttons below may work but probably
+            will fail silently.
+        </div>
+        <br/>
+        <input type="file" class="form-control-file">
 
-    <div class="row">
-        <div class="span8">
-            <div class="progress progress-striped progress-success">
-                <div class="bar" style="width: 0%;"></div>
+        <br/><br/>
+
+        <div class="row">
+            <div class="col-md-10">
+                <div class="progress progress-striped progress-success">
+                    <div class="bar" style="width: 0%;"></div>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button class="btn stop" id="toggle-btn">start upload</button>
             </div>
         </div>
-        <div class="span4">
-            <button class="btn stop" id="toggle-btn">start upload</button>
-        </div>
+
+        <hr/>
+        <p id="upload-result">
+        </p>
     </div>
+{% endblock page_content %}
 
-    <hr/>
-    <p id="upload-result">
-    </p>
-
-</div>
-</body>
-<script src="{{ url_for('static', filename='js/tus.js') }}"></script>
-<script src="{{ url_for('static', filename='js/products_import_main.js') }}"></script>
-</html>
+{% block page_js %}
+    {{ super() }}
+    <link href="https://netdna.bootstrapcdn.com/twitter-bootstrap/2.3.1/css/bootstrap-combined.min.css" rel="stylesheet"/>
+    <script src="{{ url_for('static', filename='js/tus.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/products_import_main.js') }}"></script>
+{% endblock page_js %}

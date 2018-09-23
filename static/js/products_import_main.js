@@ -12,6 +12,25 @@ var progressBar = progress.querySelector(".bar");
 var alertBox = document.querySelector("#support-alert");
 var uploadResult = document.querySelector("#upload-result");
 
+// Initialize Toastr Options
+toastr.options = {
+    'closeButton': true,
+    'debug': false,
+    'newestOnTop': true,
+    'progressBar': false,
+    'positionClass': 'toast-top-right',
+    'preventDuplicates': false,
+    'onclick': null,
+    'showDuration': '300',
+    'hideDuration': '1000',
+    'timeOut': '5000',
+    'extendedTimeOut': '1000',
+    'showEasing': 'swing',
+    'hideEasing': 'linear',
+    'showMethod': 'fadeIn',
+    'hideMethod': 'fadeOut'
+};
+
 if (!tus.isSupported) {
     alertBox.classList.remove("hidden");
 }
@@ -62,13 +81,19 @@ function startUpload() {
         },
         onError: function (error) {
             if (error.originalRequest) {
-                if (window.confirm("Failed because: " + error + "\nDo you want to retry?")) {
+                console.log(error);
+                toastr.options.showDuration = 5000;
+                toastr.options.onclick = function() {
+                    console.log('retry requested');
                     upload.start();
                     uploadIsRunning = true;
-                    return;
-                }
+                };
+                toastr['error']('Retry ?', 'Failed to Upload');
+                return;
             } else {
-                window.alert("Failed because: " + error);
+                toastr.options.onclick = null;
+                console.log(error);
+                toastr['error']("Failed Upload", 'Success');
             }
 
             reset();
@@ -80,6 +105,8 @@ function startUpload() {
         },
         onSuccess: function () {
             uploadResult.textContent = "Successfully Uploaded " + upload.file.name + " (" + upload.file.size + " bytes)";
+            toastr.options['onclick'] = null;
+            toastr['success']("Successfully Uploaded " + upload.file.name + " (" + upload.file.size + " bytes)", 'Success');
             reset();
         }
     };
