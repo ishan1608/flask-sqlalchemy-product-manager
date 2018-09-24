@@ -36,6 +36,7 @@ def process_csv(file_path):
     from models import Product
     from app import get_db
 
+    print('Celery Task Received: process_csv, args: file_path: {}'.format(file_path))
     db = get_db()
 
     with open(file_path, "r") as products_csv_file:
@@ -65,4 +66,5 @@ def process_csv(file_path):
 def post_product_webhook(product_id, action):
     from api import ProductResource
 
+    print('Celery Task Received: post_product_webhook, args: product_id: {}, action: {}'.format(product_id, action))
     ProductResource.post_product_webhook(product_id, action)
