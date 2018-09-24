@@ -8,7 +8,7 @@ let uploadIsRunning = false;
 const toggleBtn = document.querySelector("#toggle-btn");
 const input = document.querySelector("input[type=file]");
 const progress = document.querySelector(".progress");
-const progressBar = progress.querySelector(".bar");
+const progressBar = progress.querySelector(".progress-bar");
 const alertBox = document.querySelector("#support-alert");
 const uploadResult = document.querySelector("#upload-result");
 
