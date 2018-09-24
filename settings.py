@@ -1,11 +1,11 @@
 import os
 
 POSTGRES = {
-    'user': os.environ['POSTGRES_USER'],
-    'pw': os.environ['POSTGRES_USER_PWD'],
-    'db': os.environ['POSTGRES_DB_NAME'],
-    'host': os.environ['POSTGRES_HOST'],
-    'port': os.environ['POSTGRES_PORT'],
+    'user': os.environ.get('POSTGRES_USER'),
+    'pw': os.environ.get('POSTGRES_USER_PWD'),
+    'db': os.environ.get('POSTGRES_DB_NAME'),
+    'host': os.environ.get('POSTGRES_HOST'),
+    'port': os.environ.get('POSTGRES_PORT'),
 }
 
 DATABASE_URL = (
