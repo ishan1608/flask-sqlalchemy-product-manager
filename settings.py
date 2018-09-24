@@ -1,9 +1,11 @@
+import os
+
 POSTGRES = {
-    'user': 'ishan',
-    'pw': '612189@p3',
-    'db': 'flask-crud',
-    'host': 'localhost',
-    'port': '5432'
+    'user': os.environ['POSTGRES_USER'],
+    'pw': os.environ['POSTGRES_USER_PWD'],
+    'db': os.environ['POSTGRES_DB_NAME'],
+    'host': os.environ['POSTGRES_HOST'],
+    'port': os.environ['POSTGRES_PORT'],
 }
 
 DATABASE_URL = (
