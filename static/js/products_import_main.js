@@ -6,15 +6,22 @@
 let upload = null;
 let uploadIsRunning = false;
 
-$(function () {
-    const toggleBtn = document.querySelector("#toggle-btn");
-    const input = document.querySelector("input[type=file]");
-    const progress = document.querySelector(".progress");
-    const progressBar = progress.querySelector(".progress-bar");
-    const alertBox = document.querySelector("#support-alert");
-    const uploadResult = document.querySelector("#upload-result");
+let toggleBtn;
+let input;
+let progress;
+let progressBar;
+let alertBox;
+let uploadResult;
 
-// Initialize Toastr Options
+$(function () {
+    toggleBtn = document.querySelector("#toggle-btn");
+    input = document.querySelector("input[type=file]");
+    progress = document.querySelector(".progress");
+    progressBar = progress.querySelector(".progress-bar");
+    alertBox = document.querySelector("#support-alert");
+    uploadResult = document.querySelector("#upload-result");
+
+    // Initialize Toastr Options
     toastr.options = {
         'closeButton': true,
         'debug': false,
