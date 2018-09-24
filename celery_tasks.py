@@ -1,4 +1,5 @@
 import csv
+import os
 
 from celery import Celery
 from sqlalchemy.exc import IntegrityError
@@ -57,6 +58,7 @@ def process_csv(file_path):
                 db.session.rollback()
             except Exception as exception:
                 app.logger.error(exception)
+    os.remove(file_path)
 
 
 @celery.task
