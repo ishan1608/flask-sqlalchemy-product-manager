@@ -5,59 +5,63 @@
 
 let upload = null;
 let uploadIsRunning = false;
-const toggleBtn = document.querySelector("#toggle-btn");
-const input = document.querySelector("input[type=file]");
-const progress = document.querySelector(".progress");
-const progressBar = progress.querySelector(".progress-bar");
-const alertBox = document.querySelector("#support-alert");
-const uploadResult = document.querySelector("#upload-result");
+
+$(function () {
+    const toggleBtn = document.querySelector("#toggle-btn");
+    const input = document.querySelector("input[type=file]");
+    const progress = document.querySelector(".progress");
+    const progressBar = progress.querySelector(".progress-bar");
+    const alertBox = document.querySelector("#support-alert");
+    const uploadResult = document.querySelector("#upload-result");
 
 // Initialize Toastr Options
-toastr.options = {
-    'closeButton': true,
-    'debug': false,
-    'newestOnTop': true,
-    'progressBar': false,
-    'positionClass': 'toast-top-right',
-    'preventDuplicates': false,
-    'onclick': null,
-    'showDuration': '300',
-    'hideDuration': '1000',
-    'timeOut': '5000',
-    'extendedTimeOut': '1000',
-    'showEasing': 'swing',
-    'hideEasing': 'linear',
-    'showMethod': 'fadeIn',
-    'hideMethod': 'fadeOut'
-};
+    toastr.options = {
+        'closeButton': true,
+        'debug': false,
+        'newestOnTop': true,
+        'progressBar': false,
+        'positionClass': 'toast-top-right',
+        'preventDuplicates': false,
+        'onclick': null,
+        'showDuration': '300',
+        'hideDuration': '1000',
+        'timeOut': '5000',
+        'extendedTimeOut': '1000',
+        'showEasing': 'swing',
+        'hideEasing': 'linear',
+        'showMethod': 'fadeIn',
+        'hideMethod': 'fadeOut'
+    };
 
-if (!tus.isSupported) {
-    alertBox.classList.remove("hidden");
-}
-
-toggleBtn.addEventListener("click", function (e) {
-    e.preventDefault();
-
-    if (upload) {
-        if (uploadIsRunning) {
-            upload.abort();
-            toggleBtn.textContent = "resume upload";
-            uploadIsRunning = false;
-        } else {
-            upload.start();
-            toggleBtn.textContent = "pause upload";
-            uploadIsRunning = true;
-        }
-    } else {
-        if (input.files.length > 0) {
-            startUpload();
-        } else {
-            input.click();
-        }
+    if (!tus.isSupported) {
+        // alertBox.classList.remove("hidden");
+        $(alertBox).show();
     }
-});
 
-input.addEventListener("change", startUpload);
+    toggleBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+
+        if (upload) {
+            if (uploadIsRunning) {
+                upload.abort();
+                toggleBtn.textContent = "resume upload";
+                uploadIsRunning = false;
+            } else {
+                upload.start();
+                toggleBtn.textContent = "pause upload";
+                uploadIsRunning = true;
+            }
+        } else {
+            if (input.files.length > 0) {
+                startUpload();
+            } else {
+                input.click();
+            }
+        }
+    });
+
+    input.addEventListener("change", startUpload);
+});
 
 function startUpload() {
     let file = input.files[0];
