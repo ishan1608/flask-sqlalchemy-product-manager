@@ -23,7 +23,7 @@ def create_app():
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
     app.config['CELERY_BROKER_URL'] = settings.CELERY['CELERY_BROKER_URL']
-    app.config['CELERY_RESULT_BACKEND'] = settings.CELERY['CELERY_RESULT_BACKEND']
+    # app.config['CELERY_RESULT_BACKEND'] = settings.CELERY['CELERY_RESULT_BACKEND']
 
     db.init_app(app)
     return app
