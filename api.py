@@ -48,6 +48,8 @@ class ProductResource(Resource):
             'object': product.json()
         }
         webhook_config_url = config_db.get('webhook_config')
+        print('webhook-config')
+        print(webhook_config_url)
         if not webhook_config_url:
             return
 
